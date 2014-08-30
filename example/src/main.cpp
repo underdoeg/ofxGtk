@@ -1,63 +1,41 @@
-/*
-#include "ofMain.h"
-#include "ofApp.h"
-
-//========================================================================
-int main( ){
-	ofSetupOpenGL(1024,768,OF_WINDOW);			// <-------- setup the GL context
-
-	// this kicks off the running of my app
-	// can be OF_WINDOW or OF_FULLSCREEN
-	// pass in width and height too:
-	ofRunApp(new ofApp());
-
-}
-*/
-
-
 #include <gtkmm.h>
-#include "ofxGtkWidget.h"
+#include "ofxGtkWindow.h"
 #include "ofApp.h"
 
-class ExampleWindow : public Gtk::Window {
+class ExampleWindow : public ofxGtkWindow<ofApp> {
 public:
 
-	ExampleWindow():m_VBox(Gtk::ORIENTATION_VERTICAL), m_Button_Quit("Quit") {
-		set_default_size(1280, 720);
-		set_title("ofxGtk Example");
-
+	ExampleWindow():m_VBox(Gtk::ORIENTATION_VERTICAL), buttonColorPick("Select Color") {
 		add(m_VBox);
-
-		ofWidget.setup(new ofApp());
-
+		
+		//add the already created ofWidget to your custom layout
 		m_VBox.pack_start(ofWidget, Gtk::PACK_EXPAND_WIDGET);
-		ofWidget.show();
-
+		
+		
+		//other buttons
 		m_VBox.pack_start(m_ButtonBox, Gtk::PACK_SHRINK);
-
-		m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
+		m_ButtonBox.pack_start(buttonColorPick, Gtk::PACK_SHRINK);
 		m_ButtonBox.set_border_width(6);
 		m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-		//m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
-
+		buttonColorPick.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::onColorPick) );
+		
 		show_all_children();
-
 	}
 
 	virtual ~ExampleWindow() {
-
 	}
 
 private:
-	//Override default signal handler:
-	virtual bool on_key_press_event(GdkEventKey* event) {
-		return false;
+	void onColorPick() {
+		ofLogNotice() << "Show color picker";
+		Gtk::ColorChooserDialog picker;
+		picker.run();
+		app->color = toOf(picker.get_rgba());
 	}
 
-	ofxGtkWidget ofWidget;
 	Gtk::Box m_VBox;
 	Gtk::ButtonBox m_ButtonBox;
-	Gtk::Button m_Button_Quit;
+	Gtk::Button buttonColorPick;
 };
 
 
@@ -66,6 +44,9 @@ int main(int argc, char *argv[]) {
 	    Gtk::Application::create(argc, argv,
 	                             "cc.openframeworks.ofxGtkExample");
 	ExampleWindow window;
-
+	
+	//uncomment to setup the of widget to fill up the entire window
+	//window.setupDefault();
+	
 	return app->run(window);
 }

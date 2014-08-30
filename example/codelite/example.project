@@ -31,6 +31,7 @@
   <VirtualDirectory Name="src">
     <File Name="../src/ofApp.h"/>
     <File Name="../src/main.cpp"/>
+    <File Name="../src/ofApp.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="config">
     <File Name="../Makefile"/>
@@ -41,7 +42,9 @@
     <VirtualDirectory Name="src">
       <File Name="../../src/ofxGtkWidget.h"/>
       <File Name="../../src/ofxGtkWidget.cpp"/>
-      <File Name="../src/ofApp.cpp"/>
+      <File Name="../../src/ofxGtkUtils.h"/>
+      <File Name="../../src/ofxGtkUtils.cpp"/>
+      <File Name="../../src/ofxGtkWindow.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">

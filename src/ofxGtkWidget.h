@@ -4,7 +4,10 @@
 #include <gtkmm/widget.h>
 #include <gtkmm/cssprovider.h>
 #include <X11/Xlib.h>
+#include <glibmm/main.h>
+
 #include "ofMain.h"
+#include "ofxGtkUtils.h"
 
 #define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
 #define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
@@ -21,6 +24,8 @@ public:
 	int	getWidth();
 	int	getHeight();
 	ofPoint getWindowSize();
+	
+	void windowShouldClose();
 
 	void setNumSamples(int samples);
 	void setDoubleBuffering(bool doubleBuff);
@@ -29,7 +34,11 @@ public:
 	void setDepthBits(int depth);
 	void setStencilBits(int stencil);
 
+	ofBaseApp* app;
+
 private:
+
+	bool draw();
 
 	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 	bool on_key_press_event(GdkEventKey* key);
@@ -45,11 +54,12 @@ private:
 	void on_map();
 	void on_unmap();
 
+	bool on_idle();
 
 	void on_realize();
 	void on_unrealize();
 
-	Glib::RefPtr<Gdk::Window> m_refGdkWindow;
+	Glib::RefPtr<Gdk::Window> refWinGdk;
 
 	int glVersionMinor, glVersionMajor;
 	bool bDoubleBuffered;
@@ -57,10 +67,11 @@ private:
 	int	rBits,gBits,bBits,aBits,depthBits,stencilBits;
 
 
-	ofBaseApp* app;
 	Display* display;
 	GLXContext context;
 	bool isSetup;
+	int timerNumber;
+
 };
 
 #endif // OFXGTKWIDGET_H

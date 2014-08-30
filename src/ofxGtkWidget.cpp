@@ -1,5 +1,8 @@
 #include "ofxGtkWidget.h"
 #include <gtk-3.0/gtk/gtkx.h>
+#include "ofxGtkUtils.h"
+
+void ofGLReadyCallback();
 
 //code based on
 // https://developer.gnome.org/gtkmm-tutorial/3.12/sec-custom-widgets.html.en
@@ -34,16 +37,16 @@ void ofxGtkWidget::setup(ofBaseApp* a) {
 	//ofAppPtr			= NULL;
 	//instance			= this;
 
+	//ofSetFrameRate()
+
 	glVersionMinor=glVersionMajor=-1;
 
 	setNumSamples(4);
 
 
 	app = a;
-	ofSetupOpenGL(this, 100, 100, OF_WINDOW);
-	ofRunApp(app);
 
-	ofBackground(120);
+	//rest happens on first realize when the X11 window is created
 }
 
 ///OpenGL
@@ -89,6 +92,8 @@ void ofxGtkWidget::setupOpenGL(int w, int h, int screenMode) {
 	//opengl
 	display = gdk_x11_get_default_xdisplay();
 
+	ofSetLogLevel("ofAppRunner", OF_LOG_VERBOSE);
+
 	/*
 	int attrlist[] = {
 		GLX_RGBA, GLX_DOUBLEBUFFER,
@@ -132,20 +137,35 @@ void ofxGtkWidget::setupOpenGL(int w, int h, int screenMode) {
 
 	context = glXCreateContextAttribs(display, GLXFBConfig, 0, true, &attribs[0]);
 	 */
+
+	if( glXMakeCurrent(display, gdk_x11_window_get_xid(refWinGdk->gobj()), context ) )
+		ofGLReadyCallback();
 }
 
 /////////////////////////////////////////////////////////
 
-bool ofxGtkWidget::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
+bool ofxGtkWidget::on_idle() {
+	ofNotifyUpdate();
+	draw();
+	return true;
+}
+
+bool ofxGtkWidget::draw() {
 	if(!app)
 		return false;
 
-	if( !glXMakeCurrent(display, gdk_x11_window_get_xid(m_refGdkWindow->gobj()), context ) )
+	if( !glXMakeCurrent(display, gdk_x11_window_get_xid(refWinGdk->gobj()), context ) )
 		return false;
+ 
 
-	if(!isSetup)
+	if(!isSetup) {
 		app->setup();
+		isSetup = true;
+	}
 
+	//cout << toOf( get_style_context()->get_background_color(Gtk::STATE_FLAG_NORMAL) ) << endl;
+
+	//begin opengl rendering
 	ofViewport();		// used to be glViewport( 0, 0, width, height );
 
 	float * bgPtr = ofBgColorPtr();
@@ -160,20 +180,25 @@ bool ofxGtkWidget::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 	if ( bClearAuto == true ) {
 		ofClear(bgPtr[0]*255,bgPtr[1]*255,bgPtr[2]*255, bgPtr[3]*255);
 	}
-	
-	ofSetupScreen();
-	
-	ofNotifyUpdate();
-	ofNotifyDraw();
-	
-	glXSwapBuffers(display, gdk_x11_window_get_xid(m_refGdkWindow->gobj()) );
 
+	ofSetupScreen();
+
+	ofNotifyDraw();
+
+	glXSwapBuffers(display, gdk_x11_window_get_xid(refWinGdk->gobj()) );
+	
+	//refWinGdk->fullscreen();
+	
 	return true;
 }
 
+bool ofxGtkWidget::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
+	ofNotifyUpdate();
+	return draw();
+}
+
+
 //////// OF WRAP
-
-
 
 int ofxGtkWidget::getWidth() {
 	return get_allocated_width();
@@ -186,6 +211,11 @@ int ofxGtkWidget::getHeight() {
 ofPoint ofxGtkWidget::getWindowSize() {
 	return ofPoint(getWidth(), getHeight());
 }
+
+void ofxGtkWidget::windowShouldClose(){
+	get_parent_window()->hide();
+}
+
 
 /////////////
 
@@ -201,28 +231,27 @@ bool ofxGtkWidget::on_key_press_event(GdkEventKey* key) {
 }
 
 bool ofxGtkWidget::on_motion_notify_event(GdkEventMotion* evt) {
-	//cout << "MOTION" << endl;
 	ofNotifyMouseMoved(evt->x, evt->y);
 	return true;
 }
 
 void ofxGtkWidget::get_preferred_height_for_width_vfunc(int width, int& minimum_height, int& natural_height) const {
-	minimum_height = 60;
+	minimum_height = 150;
 	natural_height = 800;
 }
 
 void ofxGtkWidget::get_preferred_height_vfunc(int& minimum_height, int& natural_height) const {
-	minimum_height = 60;
+	minimum_height = 150;
 	natural_height = 800;
 }
 
 void ofxGtkWidget::get_preferred_width_for_height_vfunc(int height, int& minimum_width, int& natural_width) const {
-	minimum_width = 60;
+	minimum_width = 150;
 	natural_width = 800;
 }
 
 void ofxGtkWidget::get_preferred_width_vfunc(int& minimum_width, int& natural_width) const {
-	minimum_width = 60;
+	minimum_width = 150;
 	natural_width = 800;
 }
 
@@ -247,8 +276,8 @@ void ofxGtkWidget::on_size_allocate(Gtk::Allocation& allocation) {
 
 	//glViewport( (width - size ) / 2, (height - size ) / 2, size , size );
 
-	if(m_refGdkWindow) {
-		m_refGdkWindow->move_resize( allocation.get_x(), allocation.get_y(),
+	if(refWinGdk) {
+		refWinGdk->move_resize( allocation.get_x(), allocation.get_y(),
 		                             allocation.get_width(), allocation.get_height() );
 	}
 }
@@ -261,7 +290,7 @@ void ofxGtkWidget::on_realize() {
 
 	set_realized();
 
-	if(!m_refGdkWindow) {
+	if(!refWinGdk) {
 		//Create the GdkWindow:
 
 		GdkWindowAttr attributes;
@@ -279,22 +308,26 @@ void ofxGtkWidget::on_realize() {
 		attributes.window_type = GDK_WINDOW_CHILD;
 		attributes.wclass = GDK_INPUT_OUTPUT;
 
-		m_refGdkWindow = Gdk::Window::create(get_parent_window(), &attributes,
+		refWinGdk = Gdk::Window::create(get_parent_window(), &attributes,
 		                                     GDK_WA_X | GDK_WA_Y);
-		set_window(m_refGdkWindow);
-
-		//set colors
-		//override_background_color(Gdk::RGBA("red"));
-		//override_color(Gdk::RGBA("blue"));
+		set_window(refWinGdk);
 
 		//make the widget receive expose events
-		m_refGdkWindow->set_user_data(gobj());
+		refWinGdk->set_user_data(gobj());
+		
+		ofSetupOpenGL(this, 100, 100, OF_WINDOW);
+		ofRunApp(app);
+
+		ofBackground(120);
+		
+		//connect idle function
+		Glib::signal_idle().connect( sigc::mem_fun(*this, &ofxGtkWidget::on_idle) );		
 	}
 }
 
 void ofxGtkWidget::on_unrealize() {
-	if(m_refGdkWindow)
-		m_refGdkWindow.reset();
+	if(refWinGdk)
+		refWinGdk.reset();
 
 	//Call base class:
 	Gtk::Widget::on_unrealize();
