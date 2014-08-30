@@ -1,6 +1,7 @@
 #ifndef OFXGTKWINDOW_H
 #define OFXGTKWINDOW_H
 
+#include <gtkmm.h>
 #include "ofxGtkWidget.h"
 
 template<typename ofApp>

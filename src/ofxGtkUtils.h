@@ -1,9 +1,9 @@
 #ifndef OFXGTKUTILS_H
 #define OFXGTKUTILS_H
 
+#include <gtkmm.h>
 #include "ofMain.h"
-#include <gdkmm/color.h>
-#include <gdkmm/rgba.h>
+
 
 ofColor toOf(Gdk::Color& color);
 ofFloatColor toOf(Gdk::RGBA color);

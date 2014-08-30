@@ -1,13 +1,11 @@
 #ifndef OFXGTKWIDGET_H
 #define OFXGTKWIDGET_H
 
-#include <gtkmm/widget.h>
-#include <gtkmm/cssprovider.h>
+#include "ofxGtkUtils.h"
 #include <X11/Xlib.h>
 #include <glibmm/main.h>
 
 #include "ofMain.h"
-#include "ofxGtkUtils.h"
 
 #define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
 #define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
