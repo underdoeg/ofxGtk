@@ -13,6 +13,8 @@ public:
 
 		app = new ofApp();
 		ofWidget.setup(app);
+		
+		ofAddListener(ofEvents().update, this, &ofxGtkWindow::onOfUpdate);
 	}
 
 	void setupDefault() {
@@ -25,10 +27,23 @@ public:
 	virtual ~ofxGtkWindow() {
 
 	}
+	
+	void onOfUpdate(ofEventArgs& args){
+		onOfUpdate();
+	}
+	
+	virtual void onOfUpdate(){
+		
+	}
 
 	//Override default signal handler:
 	virtual bool on_key_press_event(GdkEventKey* event) {
 		ofNotifyKeyPressed(event->keyval);
+		return false;
+	}
+	
+	virtual bool on_key_release_event(GdkEventKey* event) {
+		ofNotifyKeyReleased(event->keyval);
 		return false;
 	}
 

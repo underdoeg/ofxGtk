@@ -72,6 +72,7 @@ linux64:
 	# linux only, any library that should be included in the project using
 	# pkg-config
 	ADDON_PKG_CONFIG_LIBRARIES = gtkmm-3.0
+
 	
 	# when parsing the file system looking for sources exclude this for all or
 	# a specific platform

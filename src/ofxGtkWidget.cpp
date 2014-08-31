@@ -4,6 +4,41 @@
 
 void ofGLReadyCallback();
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+ofxGtkWidget::ButtonStates::ButtonStates(){
+	for(unsigned int i=0;i<4;i++){
+		states[i] = false;
+	}
+}
+
+bool ofxGtkWidget::ButtonStates::isPressed(int button) {
+	return states[button];
+}
+
+bool ofxGtkWidget::ButtonStates::isAnyPressed() {
+	for(auto state: states) {
+		if(state.second == true)
+			return true;
+	}
+	return false;
+}
+
+void ofxGtkWidget::ButtonStates::setPressed(int button) {
+	states[button] = true;
+}
+
+void ofxGtkWidget::ButtonStates::setReleased(int button) {
+	states[button] = false;
+}
+
+void ofxGtkWidget::ButtonStates::releaseAll(){
+	for(auto state: states)
+		setReleased(state.first);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 //code based on
 // https://developer.gnome.org/gtkmm-tutorial/3.12/sec-custom-widgets.html.en
 // http://ewgeny.wordpress.com/2012/12/11/turorial-for-opengl-and-gtk3-combined-written-in-vala/
@@ -14,8 +49,11 @@ ofxGtkWidget::ofxGtkWidget():
 	app = NULL;
 	set_has_window(true);
 	isSetup = false;
+	isFullscreen = false;
 
-	add_events(Gdk::KEY_PRESS_MASK | Gdk::STRUCTURE_MASK | Gdk::KEY_RELEASE_MASK | Gdk::POINTER_MOTION_MASK);
+	add_events(Gdk::KEY_PRESS_MASK | Gdk::STRUCTURE_MASK | Gdk::KEY_RELEASE_MASK 
+	| Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
+	| Gdk::BUTTON_MOTION_MASK | Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK);
 
 	//signal_key_press_event().connect ( sigc::mem_fun(*this, &ofxGtkWidget::on_key_press_event) );
 }
@@ -49,50 +87,12 @@ void ofxGtkWidget::setup(ofBaseApp* a) {
 	//rest happens on first realize when the X11 window is created
 }
 
-///OpenGL
-
-//------------------------------------------------------------
-void ofxGtkWidget::setNumSamples(int _samples) {
-	samples=_samples;
-}
-
-//------------------------------------------------------------
-void ofxGtkWidget::setDoubleBuffering(bool doubleBuff) {
-	bDoubleBuffered = doubleBuff;
-}
-
-//------------------------------------------------------------
-void ofxGtkWidget::setColorBits(int r, int g, int b) {
-	rBits=r;
-	gBits=g;
-	bBits=b;
-}
-
-//------------------------------------------------------------
-void ofxGtkWidget::setAlphaBits(int a) {
-	aBits=a;
-}
-
-//------------------------------------------------------------
-void ofxGtkWidget::setDepthBits(int depth) {
-	depthBits=depth;
-}
-
-//------------------------------------------------------------
-void ofxGtkWidget::setStencilBits(int stencil) {
-	stencilBits=stencil;
-}
-
-void ofxGtkWidget::setOpenGLVersion(int major, int minor) {
-	glVersionMajor = major;
-	glVersionMinor = minor;
-}
 
 void ofxGtkWidget::setupOpenGL(int w, int h, int screenMode) {
 	//opengl
 	display = gdk_x11_get_default_xdisplay();
 
-	ofSetLogLevel("ofAppRunner", OF_LOG_VERBOSE);
+	//ofSetLogLevel("ofAppRunner", OF_LOG_VERBOSE);
 
 	/*
 	int attrlist[] = {
@@ -156,7 +156,7 @@ bool ofxGtkWidget::draw() {
 
 	if( !glXMakeCurrent(display, gdk_x11_window_get_xid(refWinGdk->gobj()), context ) )
 		return false;
- 
+
 
 	if(!isSetup) {
 		app->setup();
@@ -186,9 +186,7 @@ bool ofxGtkWidget::draw() {
 	ofNotifyDraw();
 
 	glXSwapBuffers(display, gdk_x11_window_get_xid(refWinGdk->gobj()) );
-	
-	//refWinGdk->fullscreen();
-	
+
 	return true;
 }
 
@@ -212,10 +210,65 @@ ofPoint ofxGtkWidget::getWindowSize() {
 	return ofPoint(getWidth(), getHeight());
 }
 
-void ofxGtkWidget::windowShouldClose(){
+void ofxGtkWidget::windowShouldClose() {
 	get_parent_window()->hide();
 }
 
+void ofxGtkWidget::setFullscreen(bool fullscreen) {
+	Gtk::Window* win = static_cast<Gtk::Window*>(get_toplevel());
+	if(win){
+		if(fullscreen){
+			win->fullscreen();
+		}else{
+			win->unfullscreen();
+		}
+	}
+	
+	isFullscreen = fullscreen;
+}
+
+void ofxGtkWidget::toggleFullscreen() {
+	setFullscreen(!isFullscreen);
+}
+
+///OpenGL
+
+//------------------------------------------------------------
+void ofxGtkWidget::setNumSamples(int _samples) {
+	samples=_samples;
+}
+
+//------------------------------------------------------------
+void ofxGtkWidget::setDoubleBuffering(bool doubleBuff) {
+	bDoubleBuffered = doubleBuff;
+}
+
+//------------------------------------------------------------
+void ofxGtkWidget::setColorBits(int r, int g, int b) {
+	rBits=r;
+	gBits=g;
+	bBits=b;
+}
+
+//------------------------------------------------------------
+void ofxGtkWidget::setAlphaBits(int a) {
+	aBits=a;
+}
+
+//------------------------------------------------------------
+void ofxGtkWidget::setDepthBits(int depth) {
+	depthBits=depth;
+}
+
+//------------------------------------------------------------
+void ofxGtkWidget::setStencilBits(int stencil) {
+	stencilBits=stencil;
+}
+
+void ofxGtkWidget::setOpenGLVersion(int major, int minor) {
+	glVersionMajor = major;
+	glVersionMinor = minor;
+}
 
 /////////////
 
@@ -225,34 +278,55 @@ bool ofxGtkWidget::on_configure_event(GdkEventConfigure* evt) {
 
 
 bool ofxGtkWidget::on_key_press_event(GdkEventKey* key) {
-	cout << "KEY" << endl;
-	cout << key->keyval << endl;
 	return true;
 }
 
 bool ofxGtkWidget::on_motion_notify_event(GdkEventMotion* evt) {
-	ofNotifyMouseMoved(evt->x, evt->y);
+	if(evt->state & GDK_BUTTON1_MASK){
+		ofNotifyMouseDragged(evt->x, evt->y, 0);
+	}else if(evt->state & GDK_BUTTON2_MASK){
+		ofNotifyMouseDragged(evt->x, evt->y, 1);
+	}if(evt->state & GDK_BUTTON3_MASK){
+		ofNotifyMouseDragged(evt->x, evt->y, 2);
+	}else{
+		ofNotifyMouseMoved(evt->x, evt->y);
+	}
+	return true;
+}
+
+bool ofxGtkWidget::on_button_press_event(GdkEventButton* evt){
+	ofNotifyMousePressed(evt->x, evt->y, evt->button);
+	return true;
+}
+
+bool ofxGtkWidget::on_button_release_event(GdkEventButton* evt){
+	ofNotifyMousePressed(evt->x, evt->y, evt->button);
+	return true;
+}
+
+bool ofxGtkWidget::on_drag_motion(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time){
+	
 	return true;
 }
 
 void ofxGtkWidget::get_preferred_height_for_width_vfunc(int width, int& minimum_height, int& natural_height) const {
 	minimum_height = 150;
-	natural_height = 800;
+	natural_height = 9999;
 }
 
 void ofxGtkWidget::get_preferred_height_vfunc(int& minimum_height, int& natural_height) const {
 	minimum_height = 150;
-	natural_height = 800;
+	natural_height = 9999;
 }
 
 void ofxGtkWidget::get_preferred_width_for_height_vfunc(int height, int& minimum_width, int& natural_width) const {
 	minimum_width = 150;
-	natural_width = 800;
+	natural_width = 9999;
 }
 
 void ofxGtkWidget::get_preferred_width_vfunc(int& minimum_width, int& natural_width) const {
 	minimum_width = 150;
-	natural_width = 800;
+	natural_width = 9999;
 }
 
 Gtk::SizeRequestMode ofxGtkWidget::get_request_mode_vfunc() const {
@@ -278,7 +352,7 @@ void ofxGtkWidget::on_size_allocate(Gtk::Allocation& allocation) {
 
 	if(refWinGdk) {
 		refWinGdk->move_resize( allocation.get_x(), allocation.get_y(),
-		                             allocation.get_width(), allocation.get_height() );
+		                        allocation.get_width(), allocation.get_height() );
 	}
 }
 
@@ -309,19 +383,19 @@ void ofxGtkWidget::on_realize() {
 		attributes.wclass = GDK_INPUT_OUTPUT;
 
 		refWinGdk = Gdk::Window::create(get_parent_window(), &attributes,
-		                                     GDK_WA_X | GDK_WA_Y);
+		                                GDK_WA_X | GDK_WA_Y);
 		set_window(refWinGdk);
 
 		//make the widget receive expose events
 		refWinGdk->set_user_data(gobj());
-		
+
 		ofSetupOpenGL(this, 100, 100, OF_WINDOW);
 		ofRunApp(app);
 
 		ofBackground(120);
-		
+
 		//connect idle function
-		Glib::signal_idle().connect( sigc::mem_fun(*this, &ofxGtkWidget::on_idle) );		
+		Glib::signal_idle().connect( sigc::mem_fun(*this, &ofxGtkWidget::on_idle) );
 	}
 }
 
@@ -332,3 +406,4 @@ void ofxGtkWidget::on_unrealize() {
 	//Call base class:
 	Gtk::Widget::on_unrealize();
 }
+
