@@ -300,7 +300,7 @@ bool ofxGtkWidget::on_button_press_event(GdkEventButton* evt){
 }
 
 bool ofxGtkWidget::on_button_release_event(GdkEventButton* evt){
-	ofNotifyMousePressed(evt->x, evt->y, evt->button);
+	ofNotifyMouseReleased(evt->x, evt->y, evt->button);
 	return true;
 }
 
