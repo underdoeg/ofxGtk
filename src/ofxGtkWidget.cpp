@@ -1,13 +1,14 @@
 #include "ofxGtkWidget.h"
 #include <gtk-3.0/gtk/gtkx.h>
 #include "ofxGtkUtils.h"
+#include "ofxGtkApp.h"
 
 void ofGLReadyCallback();
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-ofxGtkWidget::ButtonStates::ButtonStates(){
-	for(unsigned int i=0;i<4;i++){
+ofxGtkWidget::ButtonStates::ButtonStates() {
+	for(unsigned int i=0; i<4; i++) {
 		states[i] = false;
 	}
 }
@@ -32,7 +33,7 @@ void ofxGtkWidget::ButtonStates::setReleased(int button) {
 	states[button] = false;
 }
 
-void ofxGtkWidget::ButtonStates::releaseAll(){
+void ofxGtkWidget::ButtonStates::releaseAll() {
 	for(auto state: states)
 		setReleased(state.first);
 }
@@ -51,9 +52,9 @@ ofxGtkWidget::ofxGtkWidget():
 	isSetup = false;
 	isFullscreen = false;
 
-	add_events(Gdk::KEY_PRESS_MASK | Gdk::STRUCTURE_MASK | Gdk::KEY_RELEASE_MASK 
-	| Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
-	| Gdk::BUTTON_MOTION_MASK | Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK);
+	add_events(Gdk::KEY_PRESS_MASK | Gdk::STRUCTURE_MASK | Gdk::KEY_RELEASE_MASK
+	           | Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
+	           | Gdk::BUTTON_MOTION_MASK | Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK);
 
 	//signal_key_press_event().connect ( sigc::mem_fun(*this, &ofxGtkWidget::on_key_press_event) );
 }
@@ -211,19 +212,19 @@ ofPoint ofxGtkWidget::getWindowSize() {
 }
 
 void ofxGtkWidget::windowShouldClose() {
-	get_parent_window()->hide();
+	rootWindow->close();
 }
 
 void ofxGtkWidget::setFullscreen(bool fullscreen) {
 	Gtk::Window* win = static_cast<Gtk::Window*>(get_toplevel());
-	if(win){
-		if(fullscreen){
+	if(win) {
+		if(fullscreen) {
 			win->fullscreen();
-		}else{
+		} else {
 			win->unfullscreen();
 		}
 	}
-	
+
 	isFullscreen = fullscreen;
 }
 
@@ -276,36 +277,36 @@ bool ofxGtkWidget::on_configure_event(GdkEventConfigure* evt) {
 	return true;
 }
 
-
 bool ofxGtkWidget::on_key_press_event(GdkEventKey* key) {
 	return true;
 }
 
 bool ofxGtkWidget::on_motion_notify_event(GdkEventMotion* evt) {
-	if(evt->state & GDK_BUTTON1_MASK){
+	if(evt->state & GDK_BUTTON1_MASK) {
 		ofNotifyMouseDragged(evt->x, evt->y, 0);
-	}else if(evt->state & GDK_BUTTON2_MASK){
+	} else if(evt->state & GDK_BUTTON2_MASK) {
 		ofNotifyMouseDragged(evt->x, evt->y, 1);
-	}if(evt->state & GDK_BUTTON3_MASK){
+	}
+	if(evt->state & GDK_BUTTON3_MASK) {
 		ofNotifyMouseDragged(evt->x, evt->y, 2);
-	}else{
+	} else {
 		ofNotifyMouseMoved(evt->x, evt->y);
 	}
 	return true;
 }
 
-bool ofxGtkWidget::on_button_press_event(GdkEventButton* evt){
+bool ofxGtkWidget::on_button_press_event(GdkEventButton* evt) {
 	ofNotifyMousePressed(evt->x, evt->y, evt->button);
 	return true;
 }
 
-bool ofxGtkWidget::on_button_release_event(GdkEventButton* evt){
+bool ofxGtkWidget::on_button_release_event(GdkEventButton* evt) {
 	ofNotifyMouseReleased(evt->x, evt->y, evt->button);
 	return true;
 }
 
-bool ofxGtkWidget::on_drag_motion(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time){
-	
+bool ofxGtkWidget::on_drag_motion(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time) {
+
 	return true;
 }
 
@@ -407,3 +408,6 @@ void ofxGtkWidget::on_unrealize() {
 	Gtk::Widget::on_unrealize();
 }
 
+void ofxGtkWidget::setRootWindow(Gtk::Window* win) {
+	rootWindow = win;
+}

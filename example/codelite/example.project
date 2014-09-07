@@ -45,6 +45,9 @@
       <File Name="../../src/ofxGtkUtils.h"/>
       <File Name="../../src/ofxGtkUtils.cpp"/>
       <File Name="../../src/ofxGtkWindow.h"/>
+      <File Name="../../src/ofxGtk.h"/>
+      <File Name="../../src/ofxGtkApp.h"/>
+      <File Name="../../src/ofxGtkApp.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">

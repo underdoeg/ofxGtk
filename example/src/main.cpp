@@ -1,5 +1,4 @@
-#include <gtkmm.h>
-#include "ofxGtkWindow.h"
+#include "ofxGtk.h"
 #include "ofApp.h"
 
 class ExampleWindow : public ofxGtkWindow<ofApp> {
@@ -39,13 +38,13 @@ private:
 
 
 int main(int argc, char *argv[]) {
-	Glib::RefPtr<Gtk::Application> app =
-	    Gtk::Application::create(argc, argv,
-	                             "cc.openframeworks.ofxGtkExample");
+	
+	ofxGtkApp app("cc.openframeworks.ofxGtkExample");
+	
 	ExampleWindow window;
-
+		
 	//uncomment to setup the of widget to fill up the entire window
 	//window.setupDefault();
 
-	return app->run(window);
+	return app.run(&window);
 }

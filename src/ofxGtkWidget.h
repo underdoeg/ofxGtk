@@ -30,8 +30,8 @@ public:
 	~ofxGtkWidget();
 
 	void setup(ofBaseApp* app);
-	void setupOpenGL(int w, int h, int screenMode);
 	void setOpenGLVersion(int glVersionMajor, int glVersionMinor);
+	void setupOpenGL(int w, int h, int screenMode);
 
 	int	getWidth();
 	int	getHeight();
@@ -47,7 +47,9 @@ public:
 	void setAlphaBits(int a);
 	void setDepthBits(int depth);
 	void setStencilBits(int stencil);
-
+	
+	void setRootWindow(Gtk::Window* win);
+	
 	ofBaseApp* app;
 
 private:
@@ -90,6 +92,8 @@ private:
 	int timerNumber;
 
 	bool isFullscreen;
+	
+	Gtk::Window* rootWindow;
 
 };
 
