@@ -3,6 +3,8 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 	ofSetFrameRate(0);
+	drawFilled = true;
+	drawScale = 5;
 }
 
 //--------------------------------------------------------------
@@ -16,9 +18,13 @@ void ofApp::draw() {
 
 	ofSetColor(255);
 	ofDrawBitmapString(ofToString(ofGetFrameRate()), 20, 20);
-
+	
+	if(drawFilled)
+		ofFill();
+	else
+		ofNoFill();
 	ofSetColor(color);
-	ofCircle(ofGetMouseX(), ofGetMouseY(), 20);
+	ofCircle(ofGetMouseX(), ofGetMouseY(), drawScale);
 }
 
 //--------------------------------------------------------------

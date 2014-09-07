@@ -21,4 +21,6 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		
 		ofColor color;
+		bool drawFilled;
+		float drawScale;
 };
