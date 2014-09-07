@@ -35,10 +35,19 @@ public:
 		set_titlebar(headerBar);
 		headerBar.set_show_close_button(true);
 		
-		//add the color picker button
-		headerBar.pack_start(fillBtn);
-		headerBar.pack_start(buttonColorPick);
-		headerBar.pack_start(radiusBtn);
+		headerBar.pack_start(menu);
+		
+		headerBar.pack_end(fillBtn);
+		headerBar.pack_end(buttonColorPick);
+		headerBar.pack_end(radiusBtn);
+		
+		menu.append(item1);
+		item1.set_label("Item 1");
+		item1.set_submenu(subMenu);
+		subItem1.set_label("sub 1");
+		subMenu.append(subItem1);
+		subItem2.set_label("sub 2");
+		subMenu.append(subItem2);
 		
 		buttonColorPick.set_color(Gdk::Color("#fff"));
 		fillBtn.set_active(true);
@@ -75,6 +84,11 @@ private:
 	Gtk::ToggleButton fillBtn;
 	Gtk::ScaleButton radiusBtn;
 	Gtk::MenuBar menu;
+	Gtk::MenuItem item1;
+	Gtk::Menu subMenu;
+	Gtk::MenuItem subItem1;
+	Gtk::MenuItem subItem2;
+	Gtk::Separator separator;
 };
 
 
