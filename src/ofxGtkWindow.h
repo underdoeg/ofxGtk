@@ -4,8 +4,14 @@
 #include <gtkmm.h>
 #include "ofxGtkWidget.h"
 
+class ofxGtkBaseWindow: public Gtk::ApplicationWindow, public ofAppBaseGLWindow {
+public:
+	virtual void setup() {
+	};
+};
+
 template<typename ofApp>
-class ofxGtkWindow: public Gtk::ApplicationWindow, public ofAppBaseGLWindow {
+class ofxGtkWindow: public ofxGtkBaseWindow {
 public:
 	ofxGtkWindow() {
 		set_default_size(1280, 720);
@@ -14,9 +20,7 @@ public:
 		app = new ofApp();
 		ofWidget.setRootWindow(this);
 		ofWidget.setup(app);
-		
-		//set_show_menubar(true);
-		
+
 		ofAddListener(ofEvents().update, this, &ofxGtkWindow::onOfUpdate);
 	}
 
@@ -31,6 +35,8 @@ public:
 
 	}
 
+
+
 	void onOfUpdate(ofEventArgs& args) {
 		onOfUpdate();
 	}
@@ -41,15 +47,15 @@ public:
 
 	//Override default signal handler:
 	virtual bool on_key_press_event(GdkEventKey* event) {
-		
+
 		guint keyval = event->keyval;
-		
-		switch(keyval){
-			case GDK_KEY_Escape:
+
+		switch(keyval) {
+		case GDK_KEY_Escape:
 			keyval = OF_KEY_ESC;
 			break;
 		}
-		
+
 		ofNotifyKeyPressed(keyval);
 		return false;
 	}

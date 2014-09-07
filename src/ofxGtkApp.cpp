@@ -8,7 +8,9 @@ ofxGtkApp::ofxGtkApp(std::string appName) {
 ofxGtkApp::~ofxGtkApp() {
 }
 
-int ofxGtkApp::run(Gtk::Window* window) {
+int ofxGtkApp::run(ofxGtkBaseWindow* window) {
+	//window->set_application(app);
+	window->setup();
 	return app->run(*window, 0, NULL);
 }
 

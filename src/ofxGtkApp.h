@@ -2,13 +2,14 @@
 #define OFXGTKAPP_H
 
 #include "ofxGtkUtils.h"
+#include "ofxGtkWindow.h"
 
 class ofxGtkApp
 {
 public:
 	ofxGtkApp(std::string appName="cc.openFrameworks.app");
 	~ofxGtkApp();
-	int run(Gtk::Window* window);
+	int run(ofxGtkBaseWindow* window);
 	void onClose(ofEventArgs& args);
 	
 	Glib::RefPtr<Gtk::Application> app;
