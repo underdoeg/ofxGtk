@@ -286,8 +286,7 @@ bool ofxGtkWidget::on_motion_notify_event(GdkEventMotion* evt) {
 		ofNotifyMouseDragged(evt->x, evt->y, 0);
 	} else if(evt->state & GDK_BUTTON2_MASK) {
 		ofNotifyMouseDragged(evt->x, evt->y, 1);
-	}
-	if(evt->state & GDK_BUTTON3_MASK) {
+	}else if(evt->state & GDK_BUTTON3_MASK) {
 		ofNotifyMouseDragged(evt->x, evt->y, 2);
 	} else {
 		ofNotifyMouseMoved(evt->x, evt->y);
@@ -296,12 +295,12 @@ bool ofxGtkWidget::on_motion_notify_event(GdkEventMotion* evt) {
 }
 
 bool ofxGtkWidget::on_button_press_event(GdkEventButton* evt) {
-	ofNotifyMousePressed(evt->x, evt->y, evt->button);
+	ofNotifyMousePressed(evt->x, evt->y, evt->button - 1);
 	return true;
 }
 
 bool ofxGtkWidget::on_button_release_event(GdkEventButton* evt) {
-	ofNotifyMouseReleased(evt->x, evt->y, evt->button);
+	ofNotifyMouseReleased(evt->x, evt->y, evt->button - 1);
 	return true;
 }
 
