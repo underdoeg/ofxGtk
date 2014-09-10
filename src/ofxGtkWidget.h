@@ -31,7 +31,7 @@ public:
 
 	void setup(ofBaseApp* app);
 	void setOpenGLVersion(int glVersionMajor, int glVersionMinor);
-	void setupOpenGL(int w, int h, int screenMode);
+	virtual void setupOpenGL(int w, int h, ofWindowMode screenMode);
 
 	int	getWidth();
 	int	getHeight();

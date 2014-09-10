@@ -89,7 +89,7 @@ void ofxGtkWidget::setup(ofBaseApp* a) {
 }
 
 
-void ofxGtkWidget::setupOpenGL(int w, int h, int screenMode) {
+void ofxGtkWidget::setupOpenGL(int w, int h, ofWindowMode screenMode) {
 	//opengl
 	display = gdk_x11_get_default_xdisplay();
 
