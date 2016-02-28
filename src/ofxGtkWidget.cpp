@@ -3,23 +3,31 @@
 //baded on https://developer.gnome.org/gtkmm-tutorial/stable/sec-custom-widgets.html.en
 
 ofxGtkWidget::ofxGtkWidget(){
+
 	bSetup = false;
 	bFullscreen = false;
 
-	widget().add_events(Gdk::KEY_PRESS_MASK | Gdk::STRUCTURE_MASK | Gdk::KEY_RELEASE_MASK
+	glArea.add_events(Gdk::KEY_PRESS_MASK | Gdk::STRUCTURE_MASK | Gdk::KEY_RELEASE_MASK
 						| Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
 						| Gdk::BUTTON_MOTION_MASK | Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK);
-	widget().set_can_focus();
-	widget().grab_focus();
+	glArea.set_can_focus();
+	glArea.grab_focus();
 
 	//
-	widget().signal_realize().connect(sigc::mem_fun(this, &ofxGtkWidget::onRealize));
-	widget().signal_render().connect(sigc::mem_fun(this, &ofxGtkWidget::onRender));
-	widget().signal_key_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyDown));
-	widget().signal_key_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyUp));
-	widget().signal_motion_notify_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onMotionNotify));
-	widget().signal_button_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onButtonPress));
-	widget().signal_button_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onButtonRelease));
+	glArea.signal_realize().connect(sigc::mem_fun(this, &ofxGtkWidget::onRealize));
+	glArea.signal_render().connect(sigc::mem_fun(this, &ofxGtkWidget::onRender));
+	/*
+	glArea.signal_key_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyDown));
+	glArea.signal_key_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyUp));
+	*/
+	glArea.signal_motion_notify_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onMotionNotify));
+	glArea.signal_button_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onButtonPress));
+	glArea.signal_button_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onButtonRelease));
+
+	fullscreenWindow.signal_show().connect(sigc::mem_fun(this, &ofxGtkWidget::onShowFullscreen));
+	fullscreenWindow.signal_hide().connect(sigc::mem_fun(this, &ofxGtkWidget::onHideFullscreen));
+	fullscreenWindow.signal_key_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyDown));
+	fullscreenWindow.signal_key_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyUp));
 
 	//
 	app = nullptr;
@@ -27,7 +35,10 @@ ofxGtkWidget::ofxGtkWidget(){
 
 	setFPS(200);
 
-	widget().set_auto_render();
+	glArea.set_auto_render();
+
+	widget().set_shadow_type(Gtk::ShadowType::SHADOW_NONE);
+	widget().add(glArea);
 }
 
 ofxGtkWidget::~ofxGtkWidget(){
@@ -42,7 +53,7 @@ void ofxGtkWidget::setup(const ofGLWindowSettings &settings){
 }
 
 void ofxGtkWidget::makeCurrent(){
-	widget().make_current();
+	glArea.make_current();
 }
 
 void ofxGtkWidget::update(){
@@ -75,11 +86,11 @@ void ofxGtkWidget::setFPS(int newFps){
 }
 
 int ofxGtkWidget::getWidth(){
-	return widget().get_width();
+	return glArea.get_width();
 }
 
 int ofxGtkWidget::getHeight(){
-	return widget().get_height();
+	return glArea.get_height();
 }
 
 ofPoint ofxGtkWidget::getWindowSize(){
@@ -87,27 +98,27 @@ ofPoint ofxGtkWidget::getWindowSize(){
 }
 
 void ofxGtkWidget::hideCursor(){
-	widget().get_window()->set_cursor(Gdk::Cursor::create(Gdk::CursorType::BLANK_CURSOR));
+	glArea.get_window()->set_cursor(Gdk::Cursor::create(Gdk::CursorType::BLANK_CURSOR));
 }
 
 void ofxGtkWidget::showCursor(){
-	widget().get_window()->set_cursor(Gdk::Cursor::create(Gdk::CursorType::X_CURSOR));
+	glArea.get_window()->set_cursor(Gdk::Cursor::create(Gdk::CursorType::X_CURSOR));
 }
 
 void ofxGtkWidget::setWindowPosition(int x, int y){
-	Gtk::Window *win = dynamic_cast<Gtk::Window *>(widget().get_toplevel());
+	Gtk::Window *win = dynamic_cast<Gtk::Window *>(glArea.get_toplevel());
 	if(win)
 		win->move(x, y);
 }
 
 void ofxGtkWidget::setWindowShape(int w, int h){
-	Gtk::Window *win = dynamic_cast<Gtk::Window *>(widget().get_toplevel());
+	Gtk::Window *win = dynamic_cast<Gtk::Window *>(glArea.get_toplevel());
 	if(win)
 		win->resize(w, h);
 }
 
 ofPoint ofxGtkWidget::getWindowPosition(){
-	Gtk::Window *win = dynamic_cast<Gtk::Window *>(widget().get_toplevel());
+	Gtk::Window *win = dynamic_cast<Gtk::Window *>(glArea.get_toplevel());
 	if(win){
 		int x, y;
 		win->get_position(x, y);
@@ -117,20 +128,33 @@ ofPoint ofxGtkWidget::getWindowPosition(){
 }
 
 ofPoint ofxGtkWidget::getScreenSize(){
-	ofPoint(widget().get_screen()->get_width(), widget().get_screen()->get_height());
+	ofPoint(glArea.get_screen()->get_width(), glArea.get_screen()->get_height());
 }
 
 void ofxGtkWidget::setWindowTitle(string title){
-	Gtk::Window *win = dynamic_cast<Gtk::Window *>(widget().get_toplevel());
+	Gtk::Window *win = dynamic_cast<Gtk::Window *>(glArea.get_toplevel());
 	if(win)
 		win->set_title(title);
 }
 
 void ofxGtkWidget::setFullscreen(bool fullscreen){
 	if(fullscreen){
-		widget().get_window()->fullscreen();
+		//glArea.get_window()->set_opacity(.1);
+		/*
+		Gtk::Window *win = dynamic_cast<Gtk::Window *>(bin.get_toplevel());
+		if(win)
+			win->hide();
+		*/
+
+		widget().remove();
+		fullscreenWindow.show();
+		fullscreenWindow.present();
+		//fullscreenWindow.add(glArea);
+		//glArea.get_window()->fullscreen();
 	}else{
-		widget().get_window()->unfullscreen();
+		fullscreenWindow.get_window()->unfullscreen();
+		fullscreenWindow.hide();
+		//glArea.get_window()->unfullscreen();
 	}
 	bFullscreen = fullscreen;
 }
@@ -141,18 +165,20 @@ void ofxGtkWidget::toggleFullscreen(){
 
 //////////////////////////////////////////////////////////
 void ofxGtkWidget::onRealize(){
-	//ofLog() << "REALIZE";
 
+	//glArea.set_window(Gdk::Window::create());
+
+	//////////////////////////////////////////////////
 	if(!app){
 		ofLogError("ofxGtkWidget") << "no app set";
 		return;
 	}
 
-	widget().make_current();
+	glArea.make_current();
 
 	try
 	{
-		widget().throw_if_error();
+		glArea.throw_if_error();
 
 		glewExperimental = GL_TRUE;
 		glewInit();
@@ -161,7 +187,7 @@ void ofxGtkWidget::onRealize(){
 		currentRenderer = shared_ptr<ofGLProgrammableRenderer>(renderer);
 
 		int glMajor, glMinor;
-		widget().get_context()->get_version(glMajor, glMinor);
+		glArea.get_context()->get_version(glMajor, glMinor);
 		renderer->setup(glMajor, glMinor);
 		//
 
@@ -176,17 +202,21 @@ void ofxGtkWidget::onRealize(){
 	//ofRunApp(shared_ptr<ofAppBaseWindow>(this), shared_ptr<ofBaseApp>(app));
 }
 
+///////////////////////////////////////////////////////////
 bool ofxGtkWidget::onTimeout(){
 	setFPS(events().getTargetFrameRate());
-	widget().queue_render();
+	glArea.queue_render();
 	return true;
 }
 
 bool ofxGtkWidget::onRender(const Glib::RefPtr<Gdk::GLContext>& /*context*/){
 
-	widget().make_current();
+	glArea.make_current();
 
 	if(!bSetup){
+		glArea.get_toplevel()->signal_key_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyDown));
+		glArea.get_toplevel()->signal_key_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyUp));
+
 		ofRunApp(shared_ptr<ofAppBaseWindow>(this), shared_ptr<ofBaseApp>(app));
 		bSetup = true;
 	}
@@ -225,6 +255,7 @@ bool ofxGtkWidget::onMotionNotify(GdkEventMotion *evt){
 }
 
 bool ofxGtkWidget::onButtonPress(GdkEventButton *evt){
+	glArea.grab_focus();
 	events().notifyMousePressed(evt->x, evt->y, evt->button - 1);
 	return true;
 }
@@ -232,5 +263,16 @@ bool ofxGtkWidget::onButtonPress(GdkEventButton *evt){
 bool ofxGtkWidget::onButtonRelease(GdkEventButton *evt){
 	events().notifyMouseReleased(evt->x, evt->y, evt->button - 1);
 	return true;
+}
+
+void ofxGtkWidget::onShowFullscreen(){
+	fullscreenWindow.add(glArea);
+	glArea.get_window()->fullscreen();
+}
+
+void ofxGtkWidget::onHideFullscreen(){
+	glArea.get_window()->unfullscreen();
+	fullscreenWindow.remove();
+	widget().add(glArea);
 }
 

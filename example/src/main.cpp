@@ -21,8 +21,6 @@ public:
 		box.pack_start(btn, Gtk::PACK_SHRINK);
 		box.pack_start(ofWidget, Gtk::PACK_EXPAND_WIDGET);
 
-		ofWidget.widget().show();
-
 		show_all();
 	}
 };

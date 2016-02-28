@@ -5,7 +5,7 @@
 #include <ofMain.h>
 #include "ofxGtkWrapper.h"
 
-class ofxGtkWidget: public ofAppBaseGLWindow, public ofxGtkWrapper<Gtk::GLArea>{
+class ofxGtkWidget: public ofAppBaseGLWindow, public ofxGtkWrapper<Gtk::Frame>{
 public:
 	ofxGtkWidget();
 	~ofxGtkWidget();
@@ -47,6 +47,9 @@ private:
 	bool onButtonPress(GdkEventButton* evt);
 	bool onButtonRelease(GdkEventButton* evt);
 
+	void onShowFullscreen();
+	void onHideFullscreen();
+
 	unsigned int fps;
 	sigc::connection fpsConnection;
 
@@ -55,6 +58,10 @@ private:
 	ofBaseApp* app;
 	bool bSetup;
 	bool bFullscreen;
+	Glib::RefPtr<Gdk::Window> m_refGdkWindow;
+
+	Gtk::Window fullscreenWindow;
+	Gtk::GLArea glArea;
 };
 
 #endif // OFXGTKWIDGET_H
