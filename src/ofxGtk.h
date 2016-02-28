@@ -1,5 +1,11 @@
+#ifndef OFXGTK_H
+#define OFXGTK_H
+
 #include <gtkmm.h>
-#include "ofxGtkUtils.h"
+
+//#include "ofxGtkWindow.h"
 #include "ofxGtkWidget.h"
-#include "ofxGtkWindow.h"
-#include "ofxGtkApp.h"
+
+
+
+#endif // OFXGTK_H

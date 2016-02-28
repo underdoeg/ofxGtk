@@ -1,105 +1,39 @@
 #include "ofxGtk.h"
 #include "ofApp.h"
 
-class ExampleWindow : public ofxGtkWindow<ofApp> {
+class ExampleWindow: public Gtk::Window{
+
+	Gtk::Box m_VBox {Gtk::ORIENTATION_VERTICAL, false};
+	ofxGtkWidget ofWidget;
+	Gtk::HBox box;
+	Gtk::Button btn;
+
 public:
+	ExampleWindow():btn("BUTTON"){
 
-	ExampleWindow():m_VBox(Gtk::ORIENTATION_VERTICAL), fillBtn("filled"), 
-		radiusBtn(Gtk::ICON_SIZE_LARGE_TOOLBAR, 5, 800, 1, std::vector<Glib::ustring>()){
+		set_title("ofxGtk Example");
 
+		ofWidget.setApp(new ofApp);
+
+
+		add(box);
+
+		box.pack_start(btn, Gtk::PACK_SHRINK);
+		box.pack_start(ofWidget, Gtk::PACK_EXPAND_WIDGET);
+
+		ofWidget.widget().show();
+
+		show_all();
 	}
-
-	virtual ~ExampleWindow() {
-	}
-
-	void setup() {
-		
-		/*
-		add(m_VBox);
-
-		//add the already created ofWidget to your custom layout
-		m_VBox.pack_start(ofWidget, Gtk::PACK_EXPAND_WIDGET);
-
-		//other buttons
-		m_VBox.pack_start(m_ButtonBox, Gtk::PACK_SHRINK);
-		m_ButtonBox.pack_start(buttonColorPick, Gtk::PACK_SHRINK);
-		m_ButtonBox.set_border_width(6);
-		m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-		*/
-		
-		
-		//add the openframeworks drawing area
-		add(ofWidget);
-				
-		//header bar
-		set_titlebar(headerBar);
-		headerBar.set_show_close_button(true);
-		
-		headerBar.pack_start(menu);
-		
-		headerBar.pack_end(fillBtn);
-		headerBar.pack_end(buttonColorPick);
-		headerBar.pack_end(radiusBtn);
-		
-		menu.append(item1);
-		item1.set_label("Item 1");
-		item1.set_submenu(subMenu);
-		subItem1.set_label("sub 1");
-		subMenu.append(subItem1);
-		subItem2.set_label("sub 2");
-		subMenu.append(subItem2);
-		
-		buttonColorPick.set_color(Gdk::Color("#fff"));
-		fillBtn.set_active(true);
-		radiusBtn.set_image_from_icon_name("gtk-zoom-in", Gtk::ICON_SIZE_BUTTON);
-
-		buttonColorPick.signal_color_set().connect( sigc::mem_fun(*this, &ExampleWindow::onColorPick) );
-		fillBtn.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::onFillChange) );
-		radiusBtn.signal_value_changed().connect( sigc::mem_fun(*this, &ExampleWindow::onScaleChange) );
-
-		show_all_children();
-	}
-
-private:
-	void onColorPick() {
-		app->color = toOf(buttonColorPick.get_color());
-	}
-
-	void onFillChange() {
-		if(fillBtn.get_state() == Gtk::STATE_ACTIVE){
-			app->drawFilled = true;
-		}else{
-			app->drawFilled = false;
-		}
-	}
-	
-	void onScaleChange(double value) {
-		app->drawScale = value;
-	}
-
-	Gtk::Box m_VBox;
-	Gtk::ButtonBox m_ButtonBox;
-	Gtk::ColorButton buttonColorPick;
-	Gtk::HeaderBar headerBar;
-	Gtk::ToggleButton fillBtn;
-	Gtk::ScaleButton radiusBtn;
-	Gtk::MenuBar menu;
-	Gtk::MenuItem item1;
-	Gtk::Menu subMenu;
-	Gtk::MenuItem subItem1;
-	Gtk::MenuItem subItem2;
-	Gtk::Separator separator;
 };
-
 
 int main(int argc, char *argv[]) {
 
-	ofxGtkApp app("cc.openframeworks.ofxGtkExample");
+	auto app = Gtk::Application::create(argc, argv, "cc.openframeworks.ofxGtk.example");
 
 	ExampleWindow window;
+	//window.set_default_size(1280, 720);
+	window.set_size_request(1280, 720);
 
-	//uncomment to setup the of widget to fill up the entire window
-	//window.setupDefault();
-
-	return app.run(&window);
+	return app->run(window);
 }

@@ -2,7 +2,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	ofSetFrameRate(0);
+	ofLog() << "SETUP";
+
 	drawFilled = true;
 	drawScale = 5;
 }
@@ -24,7 +25,8 @@ void ofApp::draw() {
 	else
 		ofNoFill();
 	ofSetColor(color);
-	ofCircle(ofGetMouseX(), ofGetMouseY(), drawScale);
+	ofDrawCircle(ofGetMouseX(), ofGetMouseY(), drawScale);
+
 }
 
 //--------------------------------------------------------------
@@ -40,7 +42,8 @@ void ofApp::keyPressed(int key) {
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key) {
-
+	if(key == 'f')
+		ofToggleFullscreen();
 }
 
 //--------------------------------------------------------------
