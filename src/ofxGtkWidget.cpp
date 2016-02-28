@@ -23,6 +23,8 @@ ofxGtkWidget::ofxGtkWidget(){
 	glArea.signal_motion_notify_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onMotionNotify));
 	glArea.signal_button_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onButtonPress));
 	glArea.signal_button_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onButtonRelease));
+	glArea.signal_leave_notify_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onMouseLeave));
+	glArea.signal_enter_notify_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onMouseEnter));
 
 	fullscreenWindow.signal_show().connect(sigc::mem_fun(this, &ofxGtkWidget::onShowFullscreen));
 	fullscreenWindow.signal_hide().connect(sigc::mem_fun(this, &ofxGtkWidget::onHideFullscreen));
@@ -263,6 +265,14 @@ bool ofxGtkWidget::onButtonPress(GdkEventButton *evt){
 bool ofxGtkWidget::onButtonRelease(GdkEventButton *evt){
 	events().notifyMouseReleased(evt->x, evt->y, evt->button - 1);
 	return true;
+}
+
+bool ofxGtkWidget::onMouseLeave(GdkEventCrossing *evt){
+	events().notifyMouseExited(evt->x, evt->y);
+}
+
+bool ofxGtkWidget::onMouseEnter(GdkEventCrossing *evt){
+	events().notifyMouseEntered(evt->x, evt->y);
 }
 
 void ofxGtkWidget::onShowFullscreen(){

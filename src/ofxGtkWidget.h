@@ -46,6 +46,8 @@ private:
 	bool onMotionNotify(GdkEventMotion* evt);
 	bool onButtonPress(GdkEventButton* evt);
 	bool onButtonRelease(GdkEventButton* evt);
+	bool onMouseLeave(GdkEventCrossing* evt);
+	bool onMouseEnter(GdkEventCrossing* evt);
 
 	void onShowFullscreen();
 	void onHideFullscreen();
