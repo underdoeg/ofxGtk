@@ -87,9 +87,15 @@ Gtk::Widget* widgetFromParameter(const ofParameter<bool>& param){
 
 ////////////////////////////////////////////////////////////////////////////////
 Gtk::Widget* widgetFromParameterGroup(const ofParameterGroup& params){
-	Gtk::VBox* ret = new Gtk::VBox();
-	Gtk::Label* label = new Gtk::Label(params.getName());
-	ret->pack_start(*label, false, false, 10);
+	Gtk::Frame* ret = new Gtk::Frame();
+	//Gtk::Label* label = new Gtk::Label(params.getName());
+	//ret->pack_start(*label, false, false, 10);
+	ret->set_label(params.getName());
+	Gtk::VBox* box = new Gtk::VBox();
+	box->set_margin_left(10);
+	box->set_margin_right(10);
+	box->set_size_request(200, -1);
+	ret->add(*box);
 	for(std::size_t i = 0; i < params.size(); i++){
 		Gtk::Widget* widget = nullptr;
 		string type = params.getType(i);
@@ -151,7 +157,10 @@ Gtk::Widget* widgetFromParameterGroup(const ofParameterGroup& params){
 		}
 
 		if(widget){
-			ret->pack_start(*widget, false, true, 10);
+			Gtk::Label* label = new Gtk::Label(params[i].getName());
+			label->set_alignment(Gtk::ALIGN_START);
+			box->pack_start(*label, false, true, 0);
+			box->pack_start(*widget, false, true, 10);
 		}
 	}
 
