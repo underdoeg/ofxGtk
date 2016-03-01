@@ -7,22 +7,29 @@ class ExampleWindow: public Gtk::Window{
 	ofxGtkWidget ofWidget;
 	Gtk::HBox box;
 	Gtk::Button btn;
+	ofApp app;
 
 public:
 	ExampleWindow():btn("BUTTON"){
-
 		set_title("ofxGtk Example");
 
-		ofWidget.setApp(new ofApp);
+		ofWidget.setApp(&app);
 
+		box.set_margin_left(10);
+		box.property_spacing() = 10;
 
 		add(box);
 
-		box.pack_start(btn, Gtk::PACK_SHRINK);
+		box.pack_start(*widgetFromParameterGroup(app.params), Gtk::PACK_SHRINK);
 		box.pack_start(ofWidget, Gtk::PACK_EXPAND_WIDGET);
 
-		show_all();
+		show_all_children();
+
 	}
+
+	// Widget interface
+protected:
+
 };
 
 int main(int argc, char *argv[]) {

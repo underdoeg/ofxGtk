@@ -1,11 +1,18 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
+ofApp::ofApp(){
+	params.setName("Circle Parameters");
+	params.add(radius.set("Radius", 10, 1, 150));
+	params.add(color.set("Color", ofColor::red));
+	//params.add(show.set(true));
+	params.add(drawFilled.set("Fill", true));
+}
+
 void ofApp::setup() {
 	ofLog() << "SETUP";
 
 	drawFilled = true;
-	drawScale = 5;
 }
 
 //--------------------------------------------------------------
@@ -25,8 +32,7 @@ void ofApp::draw() {
 	else
 		ofNoFill();
 	ofSetColor(color);
-	ofDrawCircle(ofGetMouseX(), ofGetMouseY(), drawScale);
-
+	ofDrawCircle(ofGetMouseX(), ofGetMouseY(), radius);
 }
 
 //--------------------------------------------------------------

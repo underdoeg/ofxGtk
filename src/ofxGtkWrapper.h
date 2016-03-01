@@ -20,6 +20,7 @@ public:
 
 protected:
 	void setWidget(WidgetType* w){
+		Gtk::manage(w);
 		m_widget = Glib::RefPtr<WidgetType>(w);
 	}
 

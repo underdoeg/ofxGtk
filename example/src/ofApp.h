@@ -5,6 +5,8 @@
 class ofApp : public ofBaseApp{
 
 	public:
+		ofApp();
+
 		void setup();
 		void update();
 		void draw();
@@ -20,7 +22,9 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
-		ofColor color;
-		bool drawFilled;
-		float drawScale;
+		ofParameterGroup params;
+		ofParameter<float> radius;
+		ofParameter<ofColor> color;
+		ofParameter<bool> drawFilled;
+		ofParameter<bool> show;
 };
