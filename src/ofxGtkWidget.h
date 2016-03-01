@@ -64,6 +64,8 @@ private:
 
 	Gtk::Window fullscreenWindow;
 	Gtk::GLArea glArea;
+
+	bool bCursor;
 };
 
 #endif // OFXGTKWIDGET_H

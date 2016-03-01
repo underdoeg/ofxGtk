@@ -4,6 +4,7 @@
 
 ofxGtkWidget::ofxGtkWidget(){
 
+	bCursor = true;
 	bSetup = false;
 	bFullscreen = false;
 
@@ -100,10 +101,12 @@ ofPoint ofxGtkWidget::getWindowSize(){
 }
 
 void ofxGtkWidget::hideCursor(){
+	bCursor = false;
 	glArea.get_window()->set_cursor(Gdk::Cursor::create(Gdk::CursorType::BLANK_CURSOR));
 }
 
 void ofxGtkWidget::showCursor(){
+	bCursor = true;
 	glArea.get_window()->set_cursor(Gdk::Cursor::create(Gdk::CursorType::X_CURSOR));
 }
 
@@ -268,10 +271,16 @@ bool ofxGtkWidget::onButtonRelease(GdkEventButton *evt){
 }
 
 bool ofxGtkWidget::onMouseLeave(GdkEventCrossing *evt){
+	if(!bCursor){
+		showCursor();
+		bCursor = false;
+	}
 	events().notifyMouseExited(evt->x, evt->y);
 }
 
 bool ofxGtkWidget::onMouseEnter(GdkEventCrossing *evt){
+	if(!bCursor)
+		hideCursor();
 	events().notifyMouseEntered(evt->x, evt->y);
 }
 

@@ -13,6 +13,8 @@ void ofApp::setup() {
 	ofLog() << "SETUP";
 
 	drawFilled = true;
+
+	//ofHideCursor();
 }
 
 //--------------------------------------------------------------

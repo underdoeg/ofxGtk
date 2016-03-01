@@ -51,13 +51,13 @@ class ofxGtkSwitch: public ofxGtkWrapper<Gtk::Switch>{
 public:
 	void set(const ofParameter<bool>& param){
 		widget().set_state(param);
-		widget().signal_state_set().connect([&](bool state)->bool {
+		widget().connect_property_changed("state", [&](){
 			//ofLog() << type;
 			//if(type == Gtk::StateType)
 			//if(type == 2)
-			ofLog() << state;
-			ofParameter<bool>(param).set(state);
-			return true;
+			//ofLog() << "state CHANGE STATE " << widget().get_state();
+			ofParameter<bool>(param).set(widget().get_state());
+			//return true;
 		});
 	}
 };
@@ -123,8 +123,7 @@ Gtk::Widget* widgetFromParameterGroup(const ofParameterGroup& params){
 			auto p = params.get<double>(i);
 			widget = widgetFromParameter(p);
 		}else if(type == typeid(ofParameter <bool> ).name()){
-			auto p = params.getBool(i);
-			widget = widgetFromParameter(p);
+			widget = widgetFromParameter(params.getBool(i));
 		}else if(type == typeid(ofParameter <ofVec2f> ).name()){
 			auto p = params.getVec2f(i);
 			widget = widgetFromParameter(p);
