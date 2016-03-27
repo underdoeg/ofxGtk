@@ -44,8 +44,8 @@ ofxGtkWidget::ofxGtkWidget(){
 	widget().add(glArea);
 }
 
-ofxGtkWidget::~ofxGtkWidget(){
-}
+//ofxGtkWidget::~ofxGtkWidget(){
+//}
 
 void ofxGtkWidget::setApp(ofBaseApp *a){
 	app = a;
@@ -175,14 +175,13 @@ void ofxGtkWidget::onRealize(){
 
 	//////////////////////////////////////////////////
 	if(!app){
-		ofLogError("ofxGtkWidget") << "no app set";
+		ofLogError("ofxGtkWidget") << "ofApp is not set";
 		return;
 	}
 
 	glArea.make_current();
 
-	try
-	{
+	try{
 		glArea.throw_if_error();
 
 		glewExperimental = GL_TRUE;
@@ -196,10 +195,7 @@ void ofxGtkWidget::onRealize(){
 		renderer->setup(glMajor, glMinor);
 		//
 
-	}
-
-	catch(const Gdk::GLError& gle)
-	{
+	}catch(const Gdk::GLError& gle){
 		cerr << "An error occured making the context current during realize:" << endl;
 		cerr << gle.domain() << "-" << gle.code() << "-" << gle.what() << endl;
 	}
@@ -215,7 +211,6 @@ bool ofxGtkWidget::onTimeout(){
 }
 
 bool ofxGtkWidget::onRender(const Glib::RefPtr<Gdk::GLContext>& /*context*/){
-
 	glArea.make_current();
 
 	if(!bSetup){

@@ -16,11 +16,17 @@ public:
 		return *ret;
 	}
 
+	~ofxGtkWrapper(){
+		if(m_widget){
+			//
+		}
+	}
+
 	operator WidgetType&() { return widget(); }
 
 protected:
 	void setWidget(WidgetType* w){
-		Gtk::manage(w);
+		//Gtk::manage(w);
 		m_widget = Glib::RefPtr<WidgetType>(w);
 	}
 

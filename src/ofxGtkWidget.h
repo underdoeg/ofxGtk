@@ -8,7 +8,7 @@
 class ofxGtkWidget: public ofAppBaseGLWindow, public ofxGtkWrapper<Gtk::Frame>{
 public:
 	ofxGtkWidget();
-	~ofxGtkWidget();
+	//~ofxGtkWidget();
 
 	//
 	static bool doesLoop(){ return true; }
@@ -60,7 +60,7 @@ private:
 	ofBaseApp* app;
 	bool bSetup;
 	bool bFullscreen;
-	Glib::RefPtr<Gdk::Window> m_refGdkWindow;
+	//Glib::RefPtr<Gdk::Window> m_refGdkWindow;
 
 	Gtk::Window fullscreenWindow;
 	Gtk::GLArea glArea;
