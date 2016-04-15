@@ -48,15 +48,21 @@ ofxGtkWidget::ofxGtkWidget(){
 //}
 
 void ofxGtkWidget::setApp(ofBaseApp *a){
-	app = a;
+	app = shared_ptr<ofBaseApp>(a);
+	ofRunApp(shared_ptr<ofAppBaseWindow>(this), app);
 }
 
 void ofxGtkWidget::setup(const ofGLWindowSettings &settings){
-
+	makeCurrent();
 }
 
 void ofxGtkWidget::makeCurrent(){
-	glArea.make_current();
+	std::shared_ptr<ofMainLoop> mainLoop = ofGetMainLoop();
+	if(mainLoop){
+		mainLoop->setCurrentWindow(this);
+	}else{
+		ofLog() << "NO MAINLOOP";
+	}
 }
 
 void ofxGtkWidget::update(){
@@ -212,12 +218,14 @@ bool ofxGtkWidget::onTimeout(){
 
 bool ofxGtkWidget::onRender(const Glib::RefPtr<Gdk::GLContext>& /*context*/){
 	glArea.make_current();
+	makeCurrent();
 
 	if(!bSetup){
 		glArea.get_toplevel()->signal_key_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyDown));
 		glArea.get_toplevel()->signal_key_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyUp));
 
-		ofRunApp(shared_ptr<ofAppBaseWindow>(this), shared_ptr<ofBaseApp>(app));
+		app->setup();
+
 		bSetup = true;
 	}
 

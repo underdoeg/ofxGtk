@@ -57,7 +57,7 @@ private:
 
 	shared_ptr<ofBaseRenderer> currentRenderer;
 	ofCoreEvents coreEvents;
-	ofBaseApp* app;
+	shared_ptr<ofBaseApp> app;
 	bool bSetup;
 	bool bFullscreen;
 	//Glib::RefPtr<Gdk::Window> m_refGdkWindow;
