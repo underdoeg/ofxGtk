@@ -1,169 +1,128 @@
 #include "ofxGtkParams.h"
 
-ofColor toOf(Gdk::RGBA src){
-	return ofShortColor(src.get_red_u(), src.get_green_u(), src.get_blue_u(), src.get_alpha_u());
-}
-
-Gdk::RGBA toGtk(ofColor color){
-	ofShortColor col = color;
-	Gdk::RGBA ret;
-	ret.set_red_u(col.r);
-	ret.set_green_u(col.g);
-	ret.set_blue_u(col.b);
-	ret.set_alpha_u(col.a);
-	return ret;
-}
-
-////////////////////////////////////////////////
-class ofxGtkScale: public ofxGtkWrapper<Gtk::Scale>{
-public:
-	ofxGtkScale(){
-		adjustment = Gtk::Adjustment::create(0, 0, 1024);
-		setWidget(new Gtk::Scale(adjustment));
-	}
-
-	void set(const ofParameter<float>& param){
-		widget().set_range(param.getMin(), param.getMax());
-		widget().set_value(param);
-		widget().signal_value_changed().connect([&] {
-			//TODO: Why is this necessary?!?! reference passing only seems to work with const for some reason...
-			ofParameter<float>(param).set(widget().get_value());
-		});
-	}
-
-	Glib::RefPtr<Gtk::Adjustment> adjustment;
-};
-
-class ofxGtkColor: public ofxGtkWrapper<Gtk::ColorButton>{
-public:
-	void set(const ofParameter<ofColor>& param){
-		//widget().set_value(param);
-		Gdk::RGBA col = toGtk(param.get());
-		widget().set_rgba(col);
-		widget().signal_color_set().connect([&] {
-			ofLog() << "CHANGED";
-			ofParameter<ofColor>(param).set(toOf(widget().get_rgba()));
-		});
-	}
-};
-
-class ofxGtkSwitch: public ofxGtkWrapper<Gtk::Switch>{
-public:
-	void set(const ofParameter<bool>& param){
-		widget().set_state(param);
-		widget().connect_property_changed("state", [&](){
-			//ofLog() << type;
-			//if(type == Gtk::StateType)
-			//if(type == 2)
-			//ofLog() << "state CHANGE STATE " << widget().get_state();
-			ofParameter<bool>(param).set(widget().get_state());
-			//return true;
-		});
-	}
-};
-
+static int spacing = 15;
 
 ////////////////////////////////////////////////////
+
+
 template<>
-Gtk::Widget* widgetFromParameter(const ofParameter<float>& param){
-	ofxGtkScale* item = new ofxGtkScale();
-	item->set(param);
-	return &item->widget();
+Gtk::Widget* widgetFromParameter(ofParameter<float>& param){
+	return new ofxGtkSpinButton<float>(param);
 }
 
 template<>
-Gtk::Widget* widgetFromParameter(const ofParameter<ofColor>& param){
-	ofxGtkColor* item = new ofxGtkColor();
-	item->set(param);
-	return &item->widget();
+Gtk::Widget* widgetFromParameter(ofParameter<int>& param){
+	return new ofxGtkSpinButton<int>(param);
 }
 
 template<>
-Gtk::Widget* widgetFromParameter(const ofParameter<bool>& param){
-	ofxGtkSwitch* item = new ofxGtkSwitch();
-	item->set(param);
-	return &item->widget();
+Gtk::Widget* widgetFromParameter(ofParameter<double>& param){
+	return new ofxGtkSpinButton<double>(param);
+}
+
+template<>
+Gtk::Widget* widgetFromParameter(ofParameter<ofColor>& param){
+	return new ofxGtkColor(param);
+}
+
+template<>
+Gtk::Widget* widgetFromParameter(ofParameter<bool>& param){
+	return new ofxGtkSwitch(param);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Gtk::Widget* widgetFromParameterGroup(const ofParameterGroup& params){
-	Gtk::Frame* ret = new Gtk::Frame();
-	//Gtk::Label* label = new Gtk::Label(params.getName());
-	//ret->pack_start(*label, false, false, 10);
-	ret->set_label(params.getName());
-	Gtk::VBox* box = new Gtk::VBox();
-	box->set_margin_left(10);
-	box->set_margin_right(10);
-	box->set_size_request(200, -1);
-	ret->add(*box);
-	for(std::size_t i = 0; i < params.size(); i++){
-		Gtk::Widget* widget = nullptr;
-		string type = params.getType(i);
-		if(type == typeid(ofParameter <int32_t> ).name()){
-			//widget = widgetFromParameter(params.getInt(i));
-		}else if(type == typeid(ofParameter <uint32_t> ).name()){
-			auto p = params.get<uint32_t>(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <int64_t> ).name()){
-			auto p = params.get<int64_t>(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <uint64_t> ).name()){
-			auto p = params.get<uint64_t>(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <int8_t> ).name()){
-			auto p = params.get<int8_t>(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <uint8_t> ).name()){
-			auto p = params.get<uint8_t>(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <int16_t> ).name()){
-			auto p = params.get<int16_t>(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <uint16_t> ).name()){
-			auto p = params.get<uint16_t>(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <float> ).name()){
-			auto& p = params.getFloat(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <double> ).name()){
-			auto p = params.get<double>(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <bool> ).name()){
-			widget = widgetFromParameter(params.getBool(i));
-		}else if(type == typeid(ofParameter <ofVec2f> ).name()){
-			auto p = params.getVec2f(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <ofVec3f> ).name()){
-			auto p = params.getVec3f(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <ofVec4f> ).name()){
-			widget = widgetFromParameter(params.getVec4f(i));
-		}else if(type == typeid(ofParameter <ofColor> ).name()){
-			widget = widgetFromParameter(params.getColor(i));
-		}else if(type == typeid(ofParameter <ofShortColor> ).name()){
-			auto p = params.getShortColor(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <ofFloatColor> ).name()){
-			auto p = params.getFloatColor(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameter <string> ).name()){
-			auto p = params.getString(i);
-			widget = widgetFromParameter(p);
-		}else if(type == typeid(ofParameterGroup).name()){
-			auto p = params.getGroup(i);
-			//TODO: subgroups
-		}else{
-			ofLogWarning() << "ofxBaseGroup; no control for parameter of type " << type;
-		}
 
-		if(widget){
-			Gtk::Label* label = new Gtk::Label(params[i].getName());
-			label->set_alignment(Gtk::ALIGN_START);
-			box->pack_start(*label, false, true, 0);
-			box->pack_start(*widget, false, true, 10);
+Gtk::Widget* widgetFromParameter(ofAbstractParameter& param){
+	if(param.type() == typeid(ofParameter<float>).name()){
+		return widgetFromParameter(param.cast<float>());
+	}else if(param.type() == typeid(ofParameter<int>).name()){
+		return widgetFromParameter(param.cast<int>());
+	}else if(param.type() == typeid(ofParameter<double>).name()){
+		return widgetFromParameter(param.cast<double>());
+	}else if(param.type() == typeid(ofParameter<ofColor>).name()){
+		return widgetFromParameter(param.cast<ofColor>());
+	}else if(param.type() == typeid(ofParameter<std::string>).name()){
+		return widgetFromParameter(param.cast<std::string>());
+	}else if(param.type() == typeid(ofParameter<bool>).name()){
+		return widgetFromParameter(param.cast<bool>());
+	}
+
+	return nullptr;
+}
+
+Gtk::Widget* labeledWidgetFromParameter(ofAbstractParameter& param){
+	Gtk::HBox* hBox = new Gtk::HBox();
+	hBox->set_spacing(spacing);
+
+	Gtk::Label* label = new Gtk::Label(param.getName());
+	hBox->pack_start(*label, false, false);
+
+	Gtk::Widget* widget = widgetFromParameter(param);
+	if(widget)
+		hBox->pack_end(*widget, false, false);
+	return hBox;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
+Gtk::ListBox* listBoxFromParameterGroup(ofParameterGroup& group){
+	Gtk::ListBox* listBox = new Gtk::ListBox();
+
+	for(auto param: group){
+		Gtk::ListBoxRow* row = new Gtk::ListBoxRow();
+		row->add(*labeledWidgetFromParameter(*param));
+		listBox->append(*row);
+	}
+
+	return listBox;
+}
+
+Gtk::VBox* vBoxFromParameterGroup(ofParameterGroup& group){
+	Gtk::VBox* vBox = new Gtk::VBox();
+	vBox->set_spacing(spacing);
+
+	for(auto param: group){
+		vBox->add(*labeledWidgetFromParameter(*param));
+	}
+	return vBox;
+}
+
+Gtk::ScrolledWindow* scrolledWindowFromParameterGroup(ofParameterGroup& group){
+	Gtk::ScrolledWindow* window = new Gtk::ScrolledWindow();
+	window->add(*vBoxFromParameterGroup(group));
+	return window;
+}
+
+Gtk::Expander* expanderFromParameterGroup(ofParameterGroup& group){
+	Gtk::Expander* expander = new Gtk::Expander(group.getName());
+	expander->set_spacing(spacing);
+	expander->set_use_underline(true);
+	expander->set_expanded(true);
+	expander->add(*vBoxFromParameterGroup(group));
+	return expander;
+}
+
+Gtk::Widget* widgetFromParameter(ofParameterGroup& group){
+	Gtk::Widget* topLevel;
+	Gtk::ListBox* listBox = new Gtk::ListBox();
+
+	bool allChildrenGroups = true;
+	bool hasChildGroup = false;
+	for(auto param: group){
+		if(param->type() != typeid(ofParameterGroup).name()){
+			allChildrenGroups = false;
+		}else{
+			hasChildGroup = true;
 		}
 	}
 
-	return ret;
+	if(allChildrenGroups){
+
+	}else if(!hasChildGroup){
+		return expanderFromParameterGroup(group);
+	}
+
+	return topLevel;
 }
+
 

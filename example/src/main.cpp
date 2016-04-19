@@ -20,7 +20,7 @@ public:
 
 		add(box);
 
-		box.pack_start(*widgetFromParameterGroup(app.params), Gtk::PACK_SHRINK);
+		box.pack_start(*widgetFromParameter(app.params), Gtk::PACK_SHRINK);
 		box.pack_start(ofWidget, Gtk::PACK_EXPAND_WIDGET);
 
 		show_all_children();
