@@ -13,7 +13,10 @@ Gtk::Widget* widgetFromParameter(ofParameter<Type>& param){
 }
 
 Gtk::Widget* widgetFromParameter(ofParameterGroup& group);
-
 Gtk::Widget* widgetFromParameter(ofAbstractParameter& param);
+
+Gtk::Expander* expanderFromParameterGroup(ofParameterGroup& group);
+Gtk::VBox* vBoxFromParameterGroup(ofParameterGroup& group);
+Gtk::Frame* frameFromParameterGroup(ofParameterGroup& group);
 
 #endif // OFXGTKPARAMS_H

@@ -137,4 +137,38 @@ private:
 	sigc::connection con;
 };
 
+//////////////////////////////////////////////////////////////////////////////////
+class ofxGtkEntry: public Gtk::Entry{
+public:
+	ofxGtkEntry(){}
+
+	ofxGtkEntry(ofParameter<std::string>& p){
+		set(p);
+	}
+
+	void set(ofParameter<std::string>& p){
+
+		param.makeReferenceTo(p);
+
+		if(p.isReadOnly())
+			set_sensitive(false);
+
+		param.newListener([&](const std::string& col){
+			set_text(param.get());
+		});
+
+		if(!con){
+			con = signal_changed().connect([&] {
+				param.set(get_text());
+			});
+		}
+
+		set_text(param.get());
+	}
+
+private:
+	ofParameter<std::string> param;
+	sigc::connection con;
+};
+
 #endif // OFXWIDGETS_H
