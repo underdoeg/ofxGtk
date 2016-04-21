@@ -14,6 +14,8 @@ void ofxGtkSwitch::set(ofParameter<bool> &p){
 	if(p.isReadOnly())
 		set_sensitive(false);
 
+	update();
+
 	param.newListener([&](const bool& b){
 		set_state(param);
 	});
@@ -24,7 +26,7 @@ void ofxGtkSwitch::set(ofParameter<bool> &p){
 		});
 	}
 
-	update();
+
 }
 
 void ofxGtkSwitch::update(){

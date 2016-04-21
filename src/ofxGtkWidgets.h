@@ -34,24 +34,26 @@ public:
 	void set(ofParameter<Type>& p){
 		param.makeReferenceTo(p);
 
+		if(con){
+			con.disconnect();
+		}
+
 		if(p.isReadOnly())
 			GtkWidget::set_sensitive(false);
-
-		param.newListener([&](const bool& b){
-			GtkWidget::set_value(static_cast<double>(param.get()));
-		});
-
-		if(!con){
-			con = GtkWidget::signal_value_changed().connect([&](){
-				param.set(static_cast<Type>(GtkWidget::get_value()));
-			});
-		}
 
 		if(!adjustment){
 			createAdjustment();
 		}
 
 		update();
+
+		param.newListener([&](const bool& b){
+			GtkWidget::set_value(static_cast<double>(param.get()));
+		});
+
+		con = GtkWidget::signal_value_changed().connect([&](){
+			param.set(static_cast<Type>(GtkWidget::get_value()));
+		});
 	}
 
 protected:
@@ -119,17 +121,18 @@ public:
 		if(p.isReadOnly())
 			set_sensitive(false);
 
+		if(con)
+			con.disconnect();
+
+		set_rgba(toGtk(param.get()));
+
 		param.newListener([&](const ofColor& col){
 			set_rgba(toGtk(col));
 		});
 
-		if(!con){
-			con = signal_color_set().connect([&] {
-				param.set(toOf(get_rgba()));
-			});
-		}
-
-		set_rgba(toGtk(param.get()));
+		con = signal_color_set().connect([&] {
+			param.set(toOf(get_rgba()));
+		});
 	}
 
 private:
@@ -153,17 +156,20 @@ public:
 		if(p.isReadOnly())
 			set_sensitive(false);
 
+
+		if(con)
+			con.disconnect();
+
+		set_text(param.get());
+
 		param.newListener([&](const std::string& col){
 			set_text(param.get());
 		});
 
-		if(!con){
-			con = signal_changed().connect([&] {
-				param.set(get_text());
-			});
-		}
+		con = signal_changed().connect([&] {
+			param.set(get_text());
+		});
 
-		set_text(param.get());
 	}
 
 private:
