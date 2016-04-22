@@ -38,6 +38,8 @@ public:
 			con.disconnect();
 		}
 
+		listener.unsubscribe();
+
 		if(p.isReadOnly())
 			GtkWidget::set_sensitive(false);
 
@@ -47,7 +49,7 @@ public:
 
 		update();
 
-		param.newListener([&](const bool& b){
+		listener = param.newListener([&](const bool& b){
 			GtkWidget::set_value(static_cast<double>(param.get()));
 		});
 
@@ -79,6 +81,7 @@ protected:
 	ofParameter<Type> param;
 	sigc::connection con;
 	Glib::RefPtr<Gtk::Adjustment> adjustment;
+	ofEventListener listener;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -124,9 +127,11 @@ public:
 		if(con)
 			con.disconnect();
 
+		listener.unsubscribe();
+
 		set_rgba(toGtk(param.get()));
 
-		param.newListener([&](const ofColor& col){
+		listener = param.newListener([&](const ofColor& col){
 			set_rgba(toGtk(col));
 		});
 
@@ -138,6 +143,7 @@ public:
 private:
 	ofParameter<ofColor> param;
 	sigc::connection con;
+	ofEventListener listener;
 };
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -156,13 +162,14 @@ public:
 		if(p.isReadOnly())
 			set_sensitive(false);
 
-
 		if(con)
 			con.disconnect();
 
+		listener.unsubscribe();
+
 		set_text(param.get());
 
-		param.newListener([&](const std::string& col){
+		listener = param.newListener([&](const std::string& col){
 			set_text(param.get());
 		});
 
@@ -175,6 +182,7 @@ public:
 private:
 	ofParameter<std::string> param;
 	sigc::connection con;
+	ofEventListener listener;
 };
 
 #endif // OFXWIDGETS_H
