@@ -14,9 +14,11 @@ void ofxGtkSwitch::set(ofParameter<bool> &p){
 	if(p.isReadOnly())
 		set_sensitive(false);
 
+	listener.unsubscribe();
+
 	update();
 
-	param.newListener([&](const bool& b){
+	listener = param.newListener([&](const bool& b){
 		set_state(param);
 	});
 

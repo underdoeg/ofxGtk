@@ -19,6 +19,7 @@ private:
 
 	ofParameter<bool> param;
 	sigc::connection con;
+	ofEventListener listener;
 };
 
 
