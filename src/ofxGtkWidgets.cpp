@@ -27,8 +27,6 @@ void ofxGtkSwitch::set(ofParameter<bool> &p){
 			param.set(get_state());
 		});
 	}
-
-
 }
 
 void ofxGtkSwitch::update(){

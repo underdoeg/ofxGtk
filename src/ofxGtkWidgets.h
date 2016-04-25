@@ -90,7 +90,6 @@ template<typename Type=float>
 class ofxGtkScale: public ofxGtkNumericWidget<Type, Gtk::Scale>{
 public:
 	ofxGtkScale(){}
-
 	ofxGtkScale(ofParameter<Type>& p){
 		ofxGtkNumericWidget<Type, Gtk::Scale>::set(p);
 	}

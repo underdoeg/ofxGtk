@@ -11,6 +11,11 @@ Gtk::Widget* widgetFromParameter(ofParameter<float>& param){
 }
 
 template<>
+Gtk::Widget* widgetFromParameter(ofParameter<unsigned>& param){
+	return new ofxGtkSpinButton<unsigned>(param);
+}
+
+template<>
 Gtk::Widget* widgetFromParameter(ofParameter<int>& param){
 	return new ofxGtkSpinButton<int>(param);
 }
@@ -37,22 +42,40 @@ Gtk::Widget* widgetFromParameter(ofParameter<std::string>& param){
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static std::map<std::string, WidgetFromParamFunction> widgetFromParams;
+bool bDefaultCreatorsSetup = false;
+
+void addWidgetFromParameterCreator(string typeName, WidgetFromParamFunction creator){
+	widgetFromParams[typeName] = creator;
+}
+
+
+void addDefaultCreators(){
+	if(bDefaultCreatorsSetup)
+		return;
+
+	bDefaultCreatorsSetup = true;
+
+	addParamToWidgetType<bool>();
+	addParamToWidgetType<int>();
+	addParamToWidgetType<unsigned>();
+	addParamToWidgetType<float>();
+	addParamToWidgetType<double>();
+	addParamToWidgetType<ofColor>();
+	addParamToWidgetType<std::string>();
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
 Gtk::Widget* widgetFromParameter(ofAbstractParameter& param){
-	if(param.type() == typeid(ofParameter<float>).name()){
-		return widgetFromParameter(param.cast<float>());
-	}else if(param.type() == typeid(ofParameter<int>).name()){
-		return widgetFromParameter(param.cast<int>());
-	}else if(param.type() == typeid(ofParameter<double>).name()){
-		return widgetFromParameter(param.cast<double>());
-	}else if(param.type() == typeid(ofParameter<ofColor>).name()){
-		return widgetFromParameter(param.cast<ofColor>());
-	}else if(param.type() == typeid(ofParameter<std::string>).name()){
-		return widgetFromParameter(param.cast<std::string>());
-	}else if(param.type() == typeid(ofParameter<bool>).name()){
-		return widgetFromParameter(param.cast<bool>());
-	}else if(param.type() == typeid(ofParameter<std::string>).name()){
-		return widgetFromParameter(param.cast<std::string>());
+
+	addDefaultCreators();
+
+	if(widgetFromParams.find(param.type()) != widgetFromParams.end()){
+		return widgetFromParams[param.type()](param);
 	}
+
+	ofLogWarning("widgetFromParameter") << "parameter type not registered " << param.type() << " add one with addParamToWidgetType<ParameterType>();";
 
 	return nullptr;
 }
@@ -208,6 +231,3 @@ Gtk::Widget* widgetFromParameter(ofParameterGroup& group){
 		return expanderFromParameterGroup(group);
 	}
 }
-
-
-
