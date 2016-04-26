@@ -27,4 +27,5 @@ class ofApp : public ofBaseApp{
 		ofParameter<ofColor> color;
 		ofParameter<bool> drawFilled;
 		ofParameter<bool> show;
+        ofParameter<ofVec2f> pos;
 };

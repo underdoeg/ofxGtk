@@ -40,6 +40,11 @@ Gtk::Widget* widgetFromParameter(ofParameter<std::string>& param){
 	return new ofxGtkEntry(param);
 }
 
+template<>
+Gtk::Widget* widgetFromParameter(ofParameter<ofVec2f>& param){
+    return new ofxGtkVec2(param);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static std::map<std::string, WidgetFromParamFunction> widgetFromParams;
@@ -63,6 +68,7 @@ void addDefaultCreators(){
 	addParamToWidgetType<double>();
 	addParamToWidgetType<ofColor>();
 	addParamToWidgetType<std::string>();
+    addParamToWidgetType<ofVec2f>();
 }
 
 /////////////////////////////////////////////////////////////////////////////////

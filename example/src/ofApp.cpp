@@ -2,17 +2,19 @@
 
 //--------------------------------------------------------------
 ofApp::ofApp(){
-	params.setName("Circle Parameters");
-	params.add(radius.set("Radius", 10, 5, 150));
-	params.add(color.set("Color", ofColor::red));
-	//params.add(show.set(true));
-	params.add(drawFilled.set("Fill", true));
+
 }
 
 void ofApp::setup() {
-	ofLog() << "SETUP";
 
 	drawFilled = true;
+
+    params.setName("Circle Parameters");
+    params.add(radius.set("Radius", 10, 5, 150));
+    params.add(color.set("Color", ofColor::red));
+    //params.add(show.set(true));
+    params.add(drawFilled.set("Fill", true));
+    params.add(pos.set("Pos", ofVec2f(ofGetWidth()*.5, ofGetHeight()*.5)));
 
 	//ofHideCursor();
 }
@@ -35,7 +37,7 @@ void ofApp::draw() {
 		ofNoFill();
 
 	ofSetColor(color);
-	ofDrawCircle(ofGetMouseX(), ofGetMouseY(), radius);
+    ofDrawCircle(pos.get().x, pos.get().y, radius);
 }
 
 //--------------------------------------------------------------

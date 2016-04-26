@@ -71,7 +71,7 @@ protected:
 		std::size_t type = typeid(Type).hash_code();
 
 		if(type == typeid(float).hash_code()){
-			adjustment->set_step_increment(.01);
+            adjustment->set_step_increment(.01);
 		}else if(type == typeid(double).hash_code()){
 			adjustment->set_step_increment(.001);
 		}
@@ -183,6 +183,95 @@ private:
 	ofParameter<std::string> param;
 	sigc::connection con;
 	ofEventListener listener;
+};
+
+//////////////////////////////////////////////////////////////////////////////////
+class ofxGtkVec2: public Gtk::HBox{
+public:
+    ofxGtkVec2(){
+        set_spacing(2);
+
+        adjustmentX = Gtk::Adjustment::create(0, 0, 1024);
+        x.set_adjustment(adjustmentX);
+        //x.set_adjustment(Gtk::Adjustment::create(0, 0, 1024));
+        //y.set_adjustment(Gtk::Adjustment::create(0, 0, 1024));
+        x.get_adjustment()->set_step_increment(.001);
+        y.get_adjustment()->set_step_increment(.001);
+
+        pack_start(x, true, true);
+        pack_start(y, true, true);
+        show_all();
+    }
+
+    ofxGtkVec2(ofParameter<ofVec2f>& p):ofxGtkVec2(){
+        set(p);
+    }
+
+    void set(ofParameter<ofVec2f>& p){
+
+        param.makeReferenceTo(p);
+
+
+        ofVec2f min = p.getMin();
+        ofVec2f max = p.getMax();
+
+
+        //this is a hack, because of does  set min and max of ofVec2f params to 0 and 1
+        if(min.distance(max) < 2){
+            min = ofVec2f(std::numeric_limits<float>::min());
+            max = ofVec2f(std::numeric_limits<float>::max());
+        }
+
+        x.get_adjustment()->set_lower(min.x);
+        x.get_adjustment()->set_upper(max.x);
+        y.get_adjustment()->set_lower(min.y);
+        y.get_adjustment()->set_upper(max.y);
+
+        if(p.isReadOnly())
+            set_sensitive(false);
+
+        if(conX)
+            conX.disconnect();
+
+        if(conY)
+            conY.disconnect();
+
+        listener.unsubscribe();
+
+        setFromVec(p.get());
+
+        listener = param.newListener([&](ofVec2f& col){
+            setFromVec(col);
+        });
+
+        conX = x.signal_value_changed().connect([&] {
+            ofVec2f v = param;
+            v.x = x.get_value();
+            param = v;
+        });
+
+        conY = y.signal_value_changed().connect([&] {
+            ofVec2f v = param;
+            v.y = y.get_value();
+            param = v;
+        });
+    }
+
+private:
+    void setFromVec(const ofVec2f& v){
+        x.set_value((double)v.x);
+        y.set_value((double)v.y);
+    }
+
+    ofParameter<ofVec2f> param;
+    sigc::connection conX;
+    sigc::connection conY;
+    ofEventListener listener;
+
+    Glib::RefPtr<Gtk::Adjustment> adjustmentX;
+
+    Gtk::SpinButton x;
+    Gtk::SpinButton y;
 };
 
 #endif // OFXWIDGETS_H
