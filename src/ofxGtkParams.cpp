@@ -87,17 +87,28 @@ Gtk::Widget* labeledWidgetFromParameter(ofAbstractParameter& param){
 		//return expanderFromParameterGroup(static_cast<ofParameterGroup&>(param));
 	}
 
+	Gtk::Widget* widget = widgetFromParameter(param);
+
+	bool noLabel = false;
+	if(widget && dynamic_cast<Gtk::Button*>(widget)){
+		noLabel = true;
+	}
+
+
 	Gtk::HBox* hBox = new Gtk::HBox();
 	hBox->set_valign(Gtk::Align::ALIGN_START);
 	hBox->set_spacing(spacing);
 
-	Gtk::Label* label = new Gtk::Label(param.getName());
-	hBox->pack_start(*label, false, false);
+	if(!noLabel){
+		Gtk::Label* label = new Gtk::Label(param.getName());
+		hBox->pack_start(*label, false, false);
+	}
 
-	Gtk::Widget* widget = widgetFromParameter(param);
 	if(widget){
-		hBox->pack_end(*widget, false, false);
-
+		if(noLabel)
+			hBox->pack_start(*widget, true, true);
+		else
+			hBox->pack_end(*widget, false, false);
 	}
 	return hBox;
 }
