@@ -5,7 +5,7 @@
 
 //#include "ofxGtkWindow.h"
 #include "ofxGtkWidget.h"
-#include "ofxGtkParams.h"
+#include "ofxGtkParameters.h"
 
 
 

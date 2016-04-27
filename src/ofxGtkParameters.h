@@ -18,10 +18,11 @@ Gtk::Widget* widgetFromParameter(Type& param){
 Gtk::Widget* widgetFromParameter(ofParameterGroup& group);
 Gtk::Widget* widgetFromParameter(ofAbstractParameter& param);
 
+/*
 Gtk::Expander* expanderFromParameterGroup(ofParameterGroup& group);
 Gtk::VBox* vBoxFromParameterGroup(ofParameterGroup& group);
 Gtk::Frame* frameFromParameterGroup(ofParameterGroup& group);
-
+*/
 
 using WidgetFromParamFunction = std::function<Gtk::Widget*(ofAbstractParameter& param)>;
 
@@ -42,5 +43,44 @@ void addParamToWidgetType(){
 }
 
 
+///////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+class ofxGtkParameters: public Gtk::ScrolledWindow{
+public:
+	ofxGtkParameters();
+	ofxGtkParameters(ofParameterGroup &group);
+
+	void set(ofParameterGroup& group);
+
+private:
+	template<typename Type>
+	Type& create(){
+		Type* ret = new Type();
+		handle(ret);
+		return *ret;
+	}
+
+	template<typename Type, typename ...Args>
+	Type& create(Args... args){
+		Type* ret = new Type(args...);
+		handle(ret);
+		return *ret;
+	}
+
+	void handle(Gtk::Widget* widget);
+
+	//
+	Gtk::Notebook& notebookFromParameterGroup(ofParameterGroup &group);
+	Gtk::Expander& expanderFromParameterGroup(ofParameterGroup &group);
+	Gtk::FlowBox& flowBoxFromParameterGroup(ofParameterGroup &group);
+	Gtk::Frame& frameFromParameterGroup(ofParameterGroup &group);
+	Gtk::Widget& labeledWidgetFromParameter(ofAbstractParameter &param);
+	Gtk::ScrolledWindow &scrolledWindowFromParameterGroup(ofParameterGroup &group);
+	Gtk::ListBox &listBoxFromParameterGroup(ofParameterGroup &group);
+	Gtk::VBox &vBoxFromParameterGroup(ofParameterGroup &group);
+
+	//
+	std::vector<shared_ptr<Gtk::Widget>> widgets;
+};
 
 #endif // OFXGTKPARAMS_H
