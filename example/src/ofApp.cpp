@@ -16,6 +16,8 @@ void ofApp::setup() {
     params.add(drawFilled.set("Fill", true));
     params.add(pos.set("Pos", ofVec2f(ofGetWidth()*.5, ofGetHeight()*.5)));
 
+	ofLog() << "SETUP";
+
 	//ofHideCursor();
 }
 

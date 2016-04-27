@@ -114,8 +114,6 @@ ofxGtkParameters::ofxGtkParameters(ofParameterGroup& group){
 void ofxGtkParameters::set(ofParameterGroup &group){
 	remove();
 
-	ofLog() << widgets.size();
-
 	widgets.clear();
 
 	bool allChildrenGroups = true;
@@ -133,6 +131,8 @@ void ofxGtkParameters::set(ofParameterGroup &group){
 	}else if(!hasChildGroup){
 		add(expanderFromParameterGroup(group));
 	}
+
+	show_all();
 }
 
 void ofxGtkParameters::handle(Gtk::Widget *widget){

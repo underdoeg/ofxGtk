@@ -5,9 +5,12 @@ class ExampleWindow: public Gtk::Window{
 
 	Gtk::Box m_VBox {Gtk::ORIENTATION_VERTICAL, false};
 	ofxGtkWidget ofWidget;
+	ofxGtkParameters parameters;
 	Gtk::HBox box;
 	Gtk::Button btn;
 	ofApp app;
+
+	ofEventListener setupListener;
 
 public:
 	ExampleWindow():btn("BUTTON"){
@@ -20,10 +23,21 @@ public:
 
 		add(box);
 
-		box.pack_start(*widgetFromParameter(app.params), Gtk::PACK_SHRINK);
+		parameters.set_size_request(350, 500);
+
+		box.pack_start(parameters, Gtk::PACK_SHRINK);
 		box.pack_start(ofWidget, Gtk::PACK_EXPAND_WIDGET);
 
+		setupListener = ofWidget.events().setup.newListener([&](ofEventArgs& a){
+			parameters.set(app.params);
+		});
+
 		show_all_children();
+	}
+
+	void on_realize(){
+		Gtk::Window::on_realize();
+
 
 	}
 

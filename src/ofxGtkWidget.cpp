@@ -224,7 +224,7 @@ bool ofxGtkWidget::onRender(const Glib::RefPtr<Gdk::GLContext>& /*context*/){
 		glArea.get_toplevel()->signal_key_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyDown));
 		glArea.get_toplevel()->signal_key_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyUp));
 
-		app->setup();
+		events().notifySetup();
 
 		bSetup = true;
 	}
