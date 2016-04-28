@@ -42,7 +42,7 @@ Gtk::Widget* widgetFromParameter(ofParameter<std::string>& param){
 
 template<>
 Gtk::Widget* widgetFromParameter(ofParameter<ofVec2f>& param){
-    return new ofxGtkVec2(param);
+	return new ofxGtkVec<ofVec2f>(param);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,6 +262,8 @@ Gtk::Widget& ofxGtkParameters::labeledWidgetFromParameter(ofAbstractParameter& p
 		return frameFromParameterGroup(static_cast<ofParameterGroup&>(param));
 		//return expanderFromParameterGroup(static_cast<ofParameterGroup&>(param));
 	}
+
+
 
 	Gtk::Widget* widget = widgetFromParameter(param);
 

@@ -150,6 +150,7 @@ private:
 class ofxGtkEntry: public Gtk::Entry{
 public:
 	ofxGtkEntry(){}
+	~ofxGtkEntry(){}
 
 	ofxGtkEntry(ofParameter<std::string>& p){
 		set(p);
@@ -168,7 +169,7 @@ public:
 		listener.unsubscribe();
 
 		set_text(param.get());
-
+/*
 		listener = param.newListener([&](const std::string& col){
 			set_text(param.get());
 		});
@@ -176,7 +177,7 @@ public:
 		con = signal_changed().connect([&] {
 			param.set(get_text());
 		});
-
+*/
 	}
 
 private:
@@ -186,55 +187,54 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////////////
-class ofxGtkVec2: public Gtk::HBox{
+template<typename VectorType>
+class ofxGtkVec: public Gtk::HBox{
 public:
-    ofxGtkVec2(){
+    ofxGtkVec(){
         set_spacing(2);
 
-        adjustmentX = Gtk::Adjustment::create(0, 0, 1024);
-        x.set_adjustment(adjustmentX);
-        //x.set_adjustment(Gtk::Adjustment::create(0, 0, 1024));
-        //y.set_adjustment(Gtk::Adjustment::create(0, 0, 1024));
-        x.get_adjustment()->set_step_increment(.001);
-        y.get_adjustment()->set_step_increment(.001);
+        for(unsigned i=0; i<VectorType::DIM; i++){
+            spinBtns.push_back(shared_ptr<Gtk::SpinButton>(new Gtk::SpinButton(.01, 3)));
+            spinBtns.back()->get_adjustment()->set_step_increment(.01);
+            spinBtns.back()->set_property("orientation", Gtk::ORIENTATION_VERTICAL);
+            pack_start(*spinBtns.back(), false, false);
+        }
 
-        pack_start(x, true, true);
-        pack_start(y, true, true);
         show_all();
     }
 
-    ofxGtkVec2(ofParameter<ofVec2f>& p):ofxGtkVec2(){
+    ofxGtkVec(ofParameter<VectorType>& p):ofxGtkVec(){
         set(p);
     }
 
-    void set(ofParameter<ofVec2f>& p){
+    void set(ofParameter<VectorType>& p){
 
         param.makeReferenceTo(p);
 
 
-        ofVec2f min = p.getMin();
-        ofVec2f max = p.getMax();
+        VectorType min = p.getMin();
+        VectorType max = p.getMax();
 
 
         //this is a hack, because of does  set min and max of ofVec2f params to 0 and 1
         if(min.distance(max) < 2){
-            min = ofVec2f(std::numeric_limits<float>::min());
-            max = ofVec2f(std::numeric_limits<float>::max());
+            min = VectorType(std::numeric_limits<float>::min());
+            max = VectorType(std::numeric_limits<float>::max());
         }
 
+        /*
         x.get_adjustment()->set_lower(min.x);
         x.get_adjustment()->set_upper(max.x);
         y.get_adjustment()->set_lower(min.y);
         y.get_adjustment()->set_upper(max.y);
+        */
 
         if(p.isReadOnly())
             set_sensitive(false);
 
-        if(conX)
-            conX.disconnect();
-
-        if(conY)
-            conY.disconnect();
+       for(auto con: connections){
+           con.disconnect();
+       }
 
         listener.unsubscribe();
 
@@ -244,6 +244,7 @@ public:
             setFromVec(col);
         });
 
+        /*
         conX = x.signal_value_changed().connect([&] {
             ofVec2f v = param;
             v.x = x.get_value();
@@ -255,23 +256,31 @@ public:
             v.y = y.get_value();
             param = v;
         });
+        */
     }
 
 private:
-    void setFromVec(const ofVec2f& v){
-        x.set_value((double)v.x);
-        y.set_value((double)v.y);
+    void setFromVec(const VectorType& v){
+        for(unsigned i=0; i<VectorType::DIM; i++){
+            spinBtns[i]->set_value((double)v[i]);
+        }
     }
 
     ofParameter<ofVec2f> param;
-    sigc::connection conX;
-    sigc::connection conY;
+    std::vector<sigc::connection> connections;
     ofEventListener listener;
 
     Glib::RefPtr<Gtk::Adjustment> adjustmentX;
 
-    Gtk::SpinButton x;
-    Gtk::SpinButton y;
+    std::vector<shared_ptr<Gtk::SpinButton>> spinBtns;
+
+    //Gtk::SpinButton x;
+    //Gtk::SpinButton y;
 };
+
+
+//////////////////////////////////////////////////////////////////////////////////
+
+
 
 #endif // OFXWIDGETS_H
