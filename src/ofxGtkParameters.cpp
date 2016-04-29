@@ -79,6 +79,8 @@ void addDefaultCreators(){
 	addParamToWidgetType<ofColor>();
 	addParamToWidgetType<std::string>();
     addParamToWidgetType<ofVec2f>();
+    addParamToWidgetType<ofVec3f>();
+    addParamToWidgetType<ofVec4f>();
 }
 
 /////////////////////////////////////////////////////////////////////////////////
