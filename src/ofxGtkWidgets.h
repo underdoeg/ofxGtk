@@ -71,7 +71,7 @@ protected:
 		std::size_t type = typeid(Type).hash_code();
 
 		if(type == typeid(float).hash_code()){
-            adjustment->set_step_increment(.01);
+			adjustment->set_step_increment(.01);
 		}else if(type == typeid(double).hash_code()){
 			adjustment->set_step_increment(.001);
 		}
@@ -169,7 +169,7 @@ public:
 		listener.unsubscribe();
 
 		set_text(param.get());
-/*
+		/*
 		listener = param.newListener([&](const std::string& col){
 			set_text(param.get());
 		});
@@ -222,41 +222,36 @@ public:
             max = VectorType(std::numeric_limits<float>::max());
         }
 
-        /*
-        x.get_adjustment()->set_lower(min.x);
-        x.get_adjustment()->set_upper(max.x);
-        y.get_adjustment()->set_lower(min.y);
-        y.get_adjustment()->set_upper(max.y);
-        */
+        for(unsigned i=0; i<VectorType::DIM; i++){
+            spinBtns[i]->get_adjustment()->set_lower(min[i]);
+            spinBtns[i]->get_adjustment()->set_upper(max[i]);
+        }
 
         if(p.isReadOnly())
             set_sensitive(false);
 
-       for(auto con: connections){
-           con.disconnect();
-       }
+        for(auto con: connections){
+            con.disconnect();
+        }
+        connections.clear();
 
         listener.unsubscribe();
 
         setFromVec(p.get());
 
-        listener = param.newListener([&](ofVec2f& col){
+        listener = param.newListener([&](VectorType& col){
             setFromVec(col);
         });
 
-        /*
-        conX = x.signal_value_changed().connect([&] {
-            ofVec2f v = param;
-            v.x = x.get_value();
-            param = v;
-        });
-
-        conY = y.signal_value_changed().connect([&] {
-            ofVec2f v = param;
-            v.y = y.get_value();
-            param = v;
-        });
-        */
+        for(auto btn: spinBtns){
+            connections.push_back(btn->signal_value_changed().connect([&] {
+                VectorType v = param;
+                for(unsigned i=0; i<VectorType::DIM; i++){
+                    v[i] = spinBtns[i]->get_value();
+                }
+                param = v;
+            }));
+        }
     }
 
 private:
@@ -266,16 +261,13 @@ private:
         }
     }
 
-    ofParameter<ofVec2f> param;
+    ofParameter<VectorType> param;
     std::vector<sigc::connection> connections;
     ofEventListener listener;
 
     Glib::RefPtr<Gtk::Adjustment> adjustmentX;
 
     std::vector<shared_ptr<Gtk::SpinButton>> spinBtns;
-
-    //Gtk::SpinButton x;
-    //Gtk::SpinButton y;
 };
 
 

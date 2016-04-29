@@ -45,6 +45,16 @@ Gtk::Widget* widgetFromParameter(ofParameter<ofVec2f>& param){
 	return new ofxGtkVec<ofVec2f>(param);
 }
 
+template<>
+Gtk::Widget* widgetFromParameter(ofParameter<ofVec3f>& param){
+	return new ofxGtkVec<ofVec3f>(param);
+}
+
+template<>
+Gtk::Widget* widgetFromParameter(ofParameter<ofVec4f>& param){
+	return new ofxGtkVec<ofVec4f>(param);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static std::map<std::string, WidgetFromParamFunction> widgetFromParams;
@@ -173,7 +183,7 @@ Gtk::Expander& ofxGtkParameters::expanderFromParameterGroup(ofParameterGroup& gr
 	//expander->set_spacing(spacing);
 	expander.set_use_underline(true);
 	expander.set_expanded(true);
-	expander.add(flowBoxFromParameterGroup(group));
+	expander.add(vBoxFromParameterGroup(group));
 	return expander;
 }
 
