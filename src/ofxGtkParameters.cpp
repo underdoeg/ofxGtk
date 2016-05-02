@@ -167,6 +167,10 @@ Gtk::Notebook& ofxGtkParameters::notebookFromParameterGroup(ofParameterGroup& gr
 
 			flowBox.set_margin_left(spacing);
 			flowBox.set_margin_right(spacing);
+			flowBox.set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+			flowBox.set_selection_mode(Gtk::SelectionMode::SELECTION_NONE);
+			//flowBox.set_homogeneous(true);
+
 
 			Gtk::Label& tabTitle = create<Gtk::Label>(param->getName());
 
