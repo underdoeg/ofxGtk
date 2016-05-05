@@ -2,6 +2,41 @@
 
 static int spacing = 15;
 
+string ofxGtkEscape(string& _str){
+
+	std::string str(_str);
+
+	ofStringReplace(str, " ", "_");
+	ofStringReplace(str, "<", "_");
+	ofStringReplace(str, ">", "_");
+	ofStringReplace(str, "{", "_");
+	ofStringReplace(str, "}", "_");
+	ofStringReplace(str, "[", "_");
+	ofStringReplace(str, "]", "_");
+	ofStringReplace(str, ",", "_");
+	ofStringReplace(str, "(", "_");
+	ofStringReplace(str, ")", "_");
+	ofStringReplace(str, "/", "_");
+	ofStringReplace(str, "\\", "_");
+	ofStringReplace(str, ".", "_");
+
+	return str;
+}
+
+std::string ofxGtkGetWidgetOscPath(ofAbstractParameter& param){
+	auto path = param.getGroupHierarchyNames();
+	for(auto& p: path){
+		p = ofxGtkEscape(p);
+	}
+
+	string str = "/";
+	string delimiter = "/";
+	for (auto i : path)
+		str += i + delimiter;
+	str = str.substr(0, str.size() - delimiter.size());
+	return str;
+}
+
 ////////////////////////////////////////////////////
 
 
@@ -269,6 +304,7 @@ Gtk::VBox& ofxGtkParameters::vBoxFromParameterGroup(ofParameterGroup& group){
 	for(auto param: group){
 		vBox.add(labeledWidgetFromParameter(*param));
 	}
+
 	return vBox;
 }
 
@@ -279,6 +315,26 @@ Gtk::Widget& ofxGtkParameters::labeledWidgetFromParameter(ofAbstractParameter& p
 		//return expanderFromParameterGroup(static_cast<ofParameterGroup&>(param));
 	}
 
+
+	auto path = ofxGtkGetWidgetOscPath(param);
+
+	Gtk::EventBox& eventBox = create<Gtk::EventBox>();
+	eventBox.set_events(Gdk::BUTTON_PRESS_MASK);
+	eventBox.set_tooltip_text(path+" (right click to copy");
+	eventBox.signal_button_press_event().connect([&, path](GdkEventButton* evt){
+		ofLog() << "Saved to clipboard (requires xclip) " << path;
+
+		auto refClipboard = Gtk::Clipboard::get();
+		refClipboard->clear();
+		refClipboard->set_can_store();
+		refClipboard->set_text(path);
+		refClipboard->store();
+
+		string command = "echo -n \""+path+"\" | xclip -selection clipboard";
+		system(command.c_str());
+
+		return true;
+	});
 
 
 	Gtk::Widget* widget = widgetFromParameter(param);
@@ -293,6 +349,8 @@ Gtk::Widget& ofxGtkParameters::labeledWidgetFromParameter(ofAbstractParameter& p
 	hBox.set_valign(Gtk::Align::ALIGN_START);
 	hBox.set_spacing(spacing);
 
+	eventBox.add(hBox);
+
 	if(!noLabel){
 		Gtk::Label& label = create<Gtk::Label>(param.getName());
 		hBox.pack_start(label, false, false);
@@ -306,7 +364,8 @@ Gtk::Widget& ofxGtkParameters::labeledWidgetFromParameter(ofAbstractParameter& p
 		else
 			hBox.pack_end(*widget, false, false);
 	}
-	return hBox;
+
+	return eventBox;
 }
 
 
