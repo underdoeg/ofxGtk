@@ -223,7 +223,7 @@ Gtk::Expander& ofxGtkParameters::expanderFromParameterGroup(ofParameterGroup& gr
 	Gtk::Expander& expander = create<Gtk::Expander>(group.getName());//new Gtk::Expander(group.getName());
 	//expander->set_spacing(spacing);
 	expander.set_use_underline(true);
-	expander.set_expanded(true);
+	expander.set_expanded(false);
 	expander.add(vBoxFromParameterGroup(group));
 	return expander;
 }
@@ -239,7 +239,11 @@ Gtk::FlowBox& ofxGtkParameters::flowBoxFromParameterGroup(ofParameterGroup& grou
 	for(auto param: group){
 		Gtk::FlowBoxChild& child = create<Gtk::FlowBoxChild>();
 		child.set_valign(Gtk::Align::ALIGN_START);
-		child.add(labeledWidgetFromParameter(*param));
+		if(param->type() == typeid(ofParameterGroup).name()){
+				child.add(frameFromParameterGroup(static_cast<ofParameterGroup&>(*param)));
+		}else{
+			child.add(labeledWidgetFromParameter(*param));
+		}
 		flowBox.add(child);
 		//flowBox.add(*labeledWidgetFromParameter(*param));
 	}
@@ -311,8 +315,8 @@ Gtk::VBox& ofxGtkParameters::vBoxFromParameterGroup(ofParameterGroup& group){
 Gtk::Widget& ofxGtkParameters::labeledWidgetFromParameter(ofAbstractParameter& param){
 
 	if(param.type() == typeid(ofParameterGroup).name()){
-		return frameFromParameterGroup(static_cast<ofParameterGroup&>(param));
-		//return expanderFromParameterGroup(static_cast<ofParameterGroup&>(param));
+		//return frameFromParameterGroup(static_cast<ofParameterGroup&>(param));
+		return expanderFromParameterGroup(static_cast<ofParameterGroup&>(param));
 	}
 
 
