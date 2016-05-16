@@ -222,9 +222,13 @@ Gtk::Notebook& ofxGtkParameters::notebookFromParameterGroup(ofParameterGroup& gr
 Gtk::Expander& ofxGtkParameters::expanderFromParameterGroup(ofParameterGroup& group){
 	Gtk::Expander& expander = create<Gtk::Expander>(group.getName());//new Gtk::Expander(group.getName());
 	//expander->set_spacing(spacing);
-	expander.set_use_underline(true);
+	expander.set_use_underline(false);
 	expander.set_expanded(false);
-	expander.add(vBoxFromParameterGroup(group));
+	Gtk::Alignment& alignment = create<Gtk::Alignment>();
+	alignment.set_padding(spacing, 0, spacing, spacing*2);
+	auto& child = vBoxFromParameterGroup(group);
+	alignment.add(child);
+	expander.add(alignment);
 	return expander;
 }
 
@@ -306,7 +310,7 @@ Gtk::VBox& ofxGtkParameters::vBoxFromParameterGroup(ofParameterGroup& group){
 	vBox.set_spacing(spacing);
 
 	for(auto param: group){
-		vBox.add(labeledWidgetFromParameter(*param));
+		vBox.pack_end(labeledWidgetFromParameter(*param));
 	}
 
 	return vBox;
