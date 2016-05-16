@@ -310,7 +310,7 @@ Gtk::VBox& ofxGtkParameters::vBoxFromParameterGroup(ofParameterGroup& group){
 	vBox.set_spacing(spacing);
 
 	for(auto param: group){
-		vBox.pack_end(labeledWidgetFromParameter(*param));
+		vBox.add(labeledWidgetFromParameter(*param));
 	}
 
 	return vBox;
