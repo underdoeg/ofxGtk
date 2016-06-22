@@ -175,8 +175,9 @@ void ofxGtkParameters::set(ofParameterGroup &group){
 
 	if(allChildrenGroups){
 		add(notebookFromParameterGroup(group));
-	}else if(!hasChildGroup){
-		add(expanderFromParameterGroup(group));
+	}else{
+		add(frameFromParameterGroup(group));
+		//add(expanderFromParameterGroup(group));
 	}
 
 	show_all();
