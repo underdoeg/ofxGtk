@@ -349,7 +349,7 @@ Gtk::Widget& ofxGtkParameters::labeledWidgetFromParameter(ofAbstractParameter& p
 	Gtk::Widget* widget = widgetFromParameter(param);
 
 	bool noLabel = false;
-	if(widget && dynamic_cast<Gtk::Button*>(widget)){
+	if(widget && dynamic_cast<Gtk::Button*>(widget) && !dynamic_cast<Gtk::ColorButton*>(widget)){
 		noLabel = true;
 	}
 
