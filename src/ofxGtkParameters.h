@@ -4,7 +4,6 @@
 #include <gtkmm.h>
 #include "ofxGtkWidgets.h"
 #include "ofMain.h"
-#include "ofxGtkWrapper.h"
 #include <type_traits>
 
 template<typename Type>

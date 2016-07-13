@@ -3,15 +3,15 @@
 
 #include <gtkmm.h>
 #include <ofMain.h>
-#include "ofxGtkWrapper.h"
 
-class ofxGtkWidget: public ofAppBaseGLWindow, public ofxGtkWrapper<Gtk::Frame>{
+class ofxGtkWidget: public ofAppBaseGLWindow, public Gtk::Frame{
 public:
 	ofxGtkWidget();
 	//~ofxGtkWidget();
 
 	//
 	static bool doesLoop(){ return true; }
+	static void loop(){};
 	//
 
 	void setApp(ofBaseApp* app);

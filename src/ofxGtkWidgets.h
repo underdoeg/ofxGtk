@@ -4,7 +4,6 @@
 #include <gtkmm.h>
 #include "ofxGtkUtils.h"
 #include "ofMain.h"
-#include "ofxGtkWrapper.h"
 
 
 class ofxGtkSwitch: public Gtk::Switch{

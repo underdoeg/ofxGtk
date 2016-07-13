@@ -1,6 +1,6 @@
 #include "ofxGtkWidget.h"
 
-//baded on https://developer.gnome.org/gtkmm-tutorial/stable/sec-custom-widgets.html.en
+//based on https://developer.gnome.org/gtkmm-tutorial/stable/sec-custom-widgets.html.en
 
 ofxGtkWidget::ofxGtkWidget(){
 
@@ -40,8 +40,8 @@ ofxGtkWidget::ofxGtkWidget(){
 
 	glArea.set_auto_render();
 
-	widget().set_shadow_type(Gtk::ShadowType::SHADOW_NONE);
-	widget().add(glArea);
+	set_shadow_type(Gtk::ShadowType::SHADOW_NONE);
+	add(glArea);
 }
 
 //ofxGtkWidget::~ofxGtkWidget(){
@@ -49,7 +49,7 @@ ofxGtkWidget::ofxGtkWidget(){
 
 void ofxGtkWidget::setApp(ofBaseApp *a){
 	app = shared_ptr<ofBaseApp>(a);
-	ofRunApp(shared_ptr<ofAppBaseWindow>(this), app);
+	ofRunApp(shared_ptr<ofxGtkWidget>(this), app);
 }
 
 void ofxGtkWidget::setup(const ofGLWindowSettings &settings){
@@ -139,7 +139,7 @@ ofPoint ofxGtkWidget::getWindowPosition(){
 }
 
 ofPoint ofxGtkWidget::getScreenSize(){
-	ofPoint(glArea.get_screen()->get_width(), glArea.get_screen()->get_height());
+	return ofPoint(glArea.get_screen()->get_width(), glArea.get_screen()->get_height());
 }
 
 void ofxGtkWidget::setWindowTitle(string title){
@@ -157,7 +157,7 @@ void ofxGtkWidget::setFullscreen(bool fullscreen){
 			win->hide();
 		*/
 
-		widget().remove();
+		remove();
 		fullscreenWindow.show();
 		fullscreenWindow.present();
 		//fullscreenWindow.add(glArea);
@@ -221,12 +221,13 @@ bool ofxGtkWidget::onRender(const Glib::RefPtr<Gdk::GLContext>& /*context*/){
 	makeCurrent();
 
 	if(!bSetup){
+
+		bSetup = true;
+
 		glArea.get_toplevel()->signal_key_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyDown));
 		glArea.get_toplevel()->signal_key_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyUp));
 
-		events().notifySetup();
-
-		bSetup = true;
+		//events().notifySetup();
 	}
 
 	currentRenderer->startRender();
@@ -295,6 +296,6 @@ void ofxGtkWidget::onShowFullscreen(){
 void ofxGtkWidget::onHideFullscreen(){
 	glArea.get_window()->unfullscreen();
 	fullscreenWindow.remove();
-	widget().add(glArea);
+	add(glArea);
 }
 

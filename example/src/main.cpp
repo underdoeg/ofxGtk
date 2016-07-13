@@ -16,6 +16,11 @@ public:
 	ExampleWindow():btn("BUTTON"){
 		set_title("ofxGtk Example");
 
+		setupListener = ofWidget.events().setup.newListener([&](ofEventArgs& a){
+			parameters.set(app.params);
+		});
+
+
 		ofWidget.setApp(&app);
 
 		box.set_margin_left(10);
@@ -28,17 +33,11 @@ public:
 		box.pack_start(parameters, Gtk::PACK_SHRINK);
 		box.pack_start(ofWidget, Gtk::PACK_EXPAND_WIDGET);
 
-		setupListener = ofWidget.events().setup.newListener([&](ofEventArgs& a){
-			parameters.set(app.params);
-		});
-
 		show_all_children();
 	}
 
 	void on_realize(){
 		Gtk::Window::on_realize();
-
-
 	}
 
 	// Widget interface
