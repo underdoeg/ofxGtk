@@ -9,8 +9,8 @@ ofxGtkWidget::ofxGtkWidget(){
 	bFullscreen = false;
 
 	glArea.add_events(Gdk::KEY_PRESS_MASK | Gdk::STRUCTURE_MASK | Gdk::KEY_RELEASE_MASK
-						| Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
-						| Gdk::BUTTON_MOTION_MASK | Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK);
+					  | Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
+					  | Gdk::BUTTON_MOTION_MASK | Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK);
 	glArea.set_can_focus();
 	glArea.grab_focus();
 
@@ -240,13 +240,31 @@ bool ofxGtkWidget::onRender(const Glib::RefPtr<Gdk::GLContext>& /*context*/){
 	return true;
 }
 
+int getKeyVal(GdkEventKey* keyEvent){
+	guint key = keyEvent->keyval;
+	int ret = gdk_keyval_to_unicode(key);
+
+	//handle special keys
+	/*
+	switch(key){
+	case GDK_KEY_Return:
+		ret = OF_KEY_RETURN;
+		break;
+	case GDK_KEY_Escape:
+		ret = OF_KEY_ESC;
+	}
+	*/
+
+	return ret;
+}
+
 bool ofxGtkWidget::onKeyUp(GdkEventKey* keyEvent){
-	events().notifyKeyReleased(keyEvent->keyval);
+	events().notifyKeyReleased(getKeyVal(keyEvent));
 	return true;
 }
 
 bool ofxGtkWidget::onKeyDown(GdkEventKey* keyEvent){
-	events().notifyKeyPressed(keyEvent->keyval);
+	events().notifyKeyPressed(getKeyVal(keyEvent));
 	return true;
 }
 
