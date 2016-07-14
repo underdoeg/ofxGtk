@@ -10,7 +10,8 @@ ofxGtkWidget::ofxGtkWidget(){
 
 	glArea.add_events(Gdk::KEY_PRESS_MASK | Gdk::STRUCTURE_MASK | Gdk::KEY_RELEASE_MASK
 					  | Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
-					  | Gdk::BUTTON_MOTION_MASK | Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK);
+					  | Gdk::BUTTON_MOTION_MASK | Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK
+					  | Gdk::SCROLL_MASK);
 	glArea.set_can_focus();
 	glArea.grab_focus();
 
@@ -26,6 +27,7 @@ ofxGtkWidget::ofxGtkWidget(){
 	glArea.signal_button_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onButtonRelease));
 	glArea.signal_leave_notify_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onMouseLeave));
 	glArea.signal_enter_notify_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onMouseEnter));
+	glArea.signal_scroll_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onScroll));
 
 	fullscreenWindow.signal_show().connect(sigc::mem_fun(this, &ofxGtkWidget::onShowFullscreen));
 	fullscreenWindow.signal_hide().connect(sigc::mem_fun(this, &ofxGtkWidget::onHideFullscreen));
@@ -221,13 +223,9 @@ bool ofxGtkWidget::onRender(const Glib::RefPtr<Gdk::GLContext>& /*context*/){
 	makeCurrent();
 
 	if(!bSetup){
-
 		bSetup = true;
-
 		glArea.get_toplevel()->signal_key_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyDown));
 		glArea.get_toplevel()->signal_key_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyUp));
-
-		//events().notifySetup();
 	}
 
 	currentRenderer->startRender();
@@ -298,12 +296,33 @@ bool ofxGtkWidget::onMouseLeave(GdkEventCrossing *evt){
 		bCursor = false;
 	}
 	events().notifyMouseExited(evt->x, evt->y);
+	return true;
 }
 
 bool ofxGtkWidget::onMouseEnter(GdkEventCrossing *evt){
 	if(!bCursor)
 		hideCursor();
 	events().notifyMouseEntered(evt->x, evt->y);
+	return true;
+}
+
+bool ofxGtkWidget::onScroll(GdkEventScroll *evt){
+	int scrollX = 0;
+	int scrollY = 0;
+
+	//TODO: smooth scrolling
+	if(evt->direction == GDK_SCROLL_UP){
+		scrollY = -1;
+	}else if(evt->direction == GDK_SCROLL_DOWN){
+		scrollY = 1;
+	}else if(evt->direction == GDK_SCROLL_LEFT){
+		scrollX = -1;
+	}else if(evt->direction == GDK_SCROLL_RIGHT){
+		scrollX = 1;
+	}
+
+	events().notifyMouseScrolled(evt->x, evt->y, scrollX, scrollY);
+	return true;
 }
 
 void ofxGtkWidget::onShowFullscreen(){
