@@ -25,14 +25,14 @@ public:
 
 	int getWidth();
 	int getHeight();
-	ofPoint getWindowSize();
+	glm::vec2 getWindowSize();
 
 	void hideCursor();
 	void showCursor();
 	void setWindowPosition(int x, int y);
 	void setWindowShape(int w, int h);
-	ofPoint getWindowPosition();
-	ofPoint getScreenSize();
+	glm::vec2 getWindowPosition();
+	glm::vec2 getScreenSize();
 	void setWindowTitle(string title);
 	void setFullscreen(bool fullscreen);
 	void toggleFullscreen();
@@ -58,7 +58,7 @@ private:
 
 	shared_ptr<ofBaseRenderer> currentRenderer;
 	ofCoreEvents coreEvents;
-	shared_ptr<ofBaseApp> app;
+	//shared_ptr<ofBaseApp> app;
 	bool bSetup;
 	bool bFullscreen;
 	//Glib::RefPtr<Gdk::Window> m_refGdkWindow;

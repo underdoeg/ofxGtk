@@ -34,8 +34,6 @@ ofxGtkWidget::ofxGtkWidget(){
 	fullscreenWindow.signal_key_press_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyDown));
 	fullscreenWindow.signal_key_release_event().connect(sigc::mem_fun(this, &ofxGtkWidget::onKeyUp));
 
-	//
-	app = nullptr;
 	//events().setFrameRate(60);
 
 	setFPS(200);
@@ -50,8 +48,8 @@ ofxGtkWidget::ofxGtkWidget(){
 //}
 
 void ofxGtkWidget::setApp(ofBaseApp *a){
-	app = shared_ptr<ofBaseApp>(a);
-	ofRunApp(shared_ptr<ofxGtkWidget>(this), app);
+	//auto app = ;
+	ofRunApp(shared_ptr<ofxGtkWidget>(this), shared_ptr<ofBaseApp>(a));
 }
 
 void ofxGtkWidget::setup(const ofGLWindowSettings &settings){
@@ -104,8 +102,8 @@ int ofxGtkWidget::getHeight(){
 	return glArea.get_height();
 }
 
-ofPoint ofxGtkWidget::getWindowSize(){
-	return  ofPoint(getWidth(), getHeight());
+glm::vec2 ofxGtkWidget::getWindowSize(){
+	return  {getWidth(), getHeight()};
 }
 
 void ofxGtkWidget::hideCursor(){
@@ -130,18 +128,18 @@ void ofxGtkWidget::setWindowShape(int w, int h){
 		win->resize(w, h);
 }
 
-ofPoint ofxGtkWidget::getWindowPosition(){
+glm::vec2 ofxGtkWidget::getWindowPosition(){
 	Gtk::Window *win = dynamic_cast<Gtk::Window *>(glArea.get_toplevel());
 	if(win){
 		int x, y;
 		win->get_position(x, y);
-		return ofPoint(x, y);
+		return {x, y};
 	}
-	return ofPoint(0, 0);
+	return {0, 0};
 }
 
-ofPoint ofxGtkWidget::getScreenSize(){
-	return ofPoint(glArea.get_screen()->get_width(), glArea.get_screen()->get_height());
+glm::vec2 ofxGtkWidget::getScreenSize(){
+	return {glArea.get_screen()->get_width(), glArea.get_screen()->get_height()};
 }
 
 void ofxGtkWidget::setWindowTitle(string title){
@@ -182,10 +180,10 @@ void ofxGtkWidget::onRealize(){
 	//glArea.set_window(Gdk::Window::create());
 
 	//////////////////////////////////////////////////
-	if(!app){
-		ofLogError("ofxGtkWidget") << "ofApp is not set";
-		return;
-	}
+//	if(!app){
+//		ofLogError("ofxGtkWidget") << "ofApp is not set";
+//		return;
+//	}
 
 	glArea.make_current();
 

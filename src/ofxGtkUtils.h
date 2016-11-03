@@ -18,4 +18,10 @@ static Gdk::RGBA toGtk(ofColor color){
 	return ret;
 }
 
+//////////////
+
+static ofRectangle toOf(Gdk::Rectangle rect){
+	return ofRectangle(rect.get_x(), rect.get_y(), rect.get_width(), rect.get_height());
+}
+
 #endif // OFXGTKUTILS_H
